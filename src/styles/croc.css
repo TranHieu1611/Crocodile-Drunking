@@ -31,16 +31,3 @@
 .nostril-g { transform-box: fill-box; transform-origin: center; animation: sniff 4.2s ease-in-out infinite; }
 @keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.06); } 82% { transform: none; } 88% { transform: scale(1.05); } }
 .croc.closed .tongue { animation-play-state: paused; }
-
-/* Chi tiết: gai, bướu, bóng */
-.croc .spike { stroke-width: 3; }
-.knob-b { fill: #0F8A27; stroke: #075C17; stroke-width: 2; }
-.knob-h { fill: #9CF59F; opacity: .55; }
-.eye-shadow { fill: #04310F; opacity: .32; }
-.brow-shade { fill: none; stroke: #04431A; stroke-width: 4; stroke-linecap: round; opacity: .45; }
-.cast-shadow { fill: #012A0C; opacity: .35; }
-.mouth-shadow { fill: #3A0207; opacity: .45; }
-.croc-shadow {
-  position: absolute; left: 10%; right: 10%; bottom: -2.5%; height: 8%;
-  border-radius: 50%; background: rgba(0, 0, 0, .55); filter: blur(10px);
-}

@@ -98,36 +98,6 @@ function flapTeeth(): string {
   return s;
 }
 
-/** Hoạ tiết vảy + dải đổ bóng (mỗi SVG cần bản riêng vì id). */
-function skinDefs(p: string): string {
-  return `
-    <pattern id="${p}-scale" width="24" height="16" patternUnits="userSpaceOnUse">
-      <path d="M0 16 Q12 3 24 16 M-12 8 Q0 -5 12 8 M12 8 Q24 -5 36 8" fill="none" stroke="#04431A" stroke-width="1.7" opacity=".4"/>
-      <path d="M4 14 Q12 6 20 14 M-8 6 Q0 -2 8 6 M16 6 Q24 -2 32 6" fill="none" stroke="#8BF297" stroke-width="1.1" opacity=".3"/>
-    </pattern>
-    <linearGradient id="${p}-shade" x1="0" y1="0" x2="0" y2="1">
-      <stop offset=".3" stop-color="#012A0C" stop-opacity="0"/><stop offset="1" stop-color="#012A0C" stop-opacity=".55"/>
-    </linearGradient>
-    <radialGradient id="${p}-hi" cx=".3" cy=".2" r=".6">
-      <stop offset="0" stop-color="#C9FFB8" stop-opacity=".45"/><stop offset="1" stop-color="#C9FFB8" stop-opacity="0"/>
-    </radialGradient>`;
-}
-
-/** Phủ vảy + bóng + vùng sáng lên một hình. */
-function skin(d: string, p: string): string {
-  return `<path d="${d}" style="fill:url(#${p}-scale)"/><path d="${d}" style="fill:url(#${p}-shade)"/><path d="${d}" style="fill:url(#${p}-hi)"/>`;
-}
-
-/** Gai nhọn (vảy sừng) — đáy giấu sau thân, chỉ lộ mũi gai. */
-function spike(x: number, y: number, h: number, w: number, rot: number, fill: string): string {
-  return `<path d="M${x - w} ${y} L${x} ${y - h} L${x + w} ${y} Z" transform="rotate(${rot} ${x} ${y})" style="fill:${fill}" class="outline spike"/>`;
-}
-
-/** Bướu xương sần (osteoderm) có điểm sáng. */
-function knob(x: number, y: number, r: number): string {
-  return `<g class="knob"><ellipse cx="${x}" cy="${y}" rx="${r}" ry="${r * 0.72}" class="knob-b"/><ellipse cx="${x - r * 0.3}" cy="${y - r * 0.3}" rx="${r * 0.4}" ry="${r * 0.25}" class="knob-h"/></g>`;
-}
-
 let uid = 0;
 
 export function crocHTML(): string {
@@ -153,7 +123,6 @@ export function crocHTML(): string {
         <ellipse cx="${e.x}" cy="${e.y}" rx="31" ry="25" class="eye-white"/>
         <g clip-path="url(#${id}-eye${i})">
           <ellipse cx="${e.x}" cy="${e.y + 14}" rx="31" ry="10" class="eye-shade"/>
-          <ellipse cx="${e.x + 6 * s}" cy="${e.y - 22}" rx="36" ry="13" class="eye-shadow"/>
           <g class="pupil" data-eye="${i}">
             <circle cx="${e.x + 2 * s}" cy="${e.y + 3}" r="14" class="eye-iris"/>
             <circle cx="${e.x + 2 * s}" cy="${e.y + 3}" r="7.5" class="eye-pupil"/>
@@ -163,10 +132,7 @@ export function crocHTML(): string {
         <ellipse cx="${e.x}" cy="${e.y}" rx="31" ry="25" class="eye-rim"/>
       </g>
     </g>
-    ${spike(e.x - 26 * s, e.y - 38, 16, 8, -30 * s, `url(#${id}-up)`)}
-    ${spike(e.x - 4 * s, e.y - 42, 14, 7, -10 * s, `url(#${id}-up)`)}
     <path class="brow" d="M${e.x - 44 * s} ${e.y - 30} Q${e.x - 4 * s} ${e.y - 50} ${e.x + 40 * s} ${e.y - 8} L${e.x + 34 * s} ${e.y + 4} Q${e.x - 6 * s} ${e.y - 30} ${e.x - 42 * s} ${e.y - 14} Z" style="fill:url(#${id}-up)"/>
-    <path class="brow-shade" d="M${e.x - 40 * s} ${e.y - 18} Q${e.x - 6 * s} ${e.y - 34} ${e.x + 34 * s} ${e.y + 2}"/>
     <path class="gloss-line" d="M${e.x - 34 * s} ${e.y - 30} Q${e.x - 6 * s} ${e.y - 44} ${e.x + 24 * s} ${e.y - 20}"/>`;
   };
 
@@ -180,7 +146,6 @@ export function crocHTML(): string {
 
   return `
   <div class="croc" role="group" aria-label="Hàm cá sấu">
-    <div class="croc-shadow" aria-hidden="true"></div>
     <svg class="croc-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true">
       <defs>
         <linearGradient id="${id}-low" x1="0" y1="0" x2="0" y2="1">
@@ -193,15 +158,11 @@ export function crocHTML(): string {
           <stop offset="0" stop-color="#FF5A5F"/><stop offset="1" stop-color="#D3141D"/>
         </radialGradient>
       </defs>
-      ${skinDefs(`${id}a`).replace(/^/, '<defs>') + '</defs>'}
       <path class="outline" fill="url(#${id}-low)" d="M13 170 L13 ${ARC_Y} A167 167 0 0 0 347 ${ARC_Y} L347 170 Z"/>
-      ${skin(`M13 170 L13 ${ARC_Y} A167 167 0 0 0 347 ${ARC_Y} L347 170 Z`, `${id}a`)}
-      ${knob(28, 196, 7)}${knob(332, 196, 7)}${knob(30, 236, 6)}${knob(330, 236, 6)}
       <path class="gloss-line wide" d="M30 220 L30 ${ARC_Y} A150 150 0 0 0 96 392"/>
       <path class="c-lip" d="M44 170 L44 ${ARC_Y} A136 136 0 0 0 316 ${ARC_Y} L316 170 Z"/>
       <path class="c-mouth" style="fill:url(#${id}-mouth)" d="M60 170 L60 ${ARC_Y} A120 120 0 0 0 300 ${ARC_Y} L300 170 Z"/>
       <ellipse cx="180" cy="214" rx="76" ry="22" class="c-throat"/>
-      <path d="M60 170 L300 170 L300 194 Q180 236 60 194 Z" class="mouth-shadow"/>
       <g class="tongue">
         <path class="c-tongue" style="fill:url(#${id}-tongue)" d="M180 236 C236 236 250 296 236 336 C224 370 136 370 124 336 C110 296 124 236 180 236 Z"/>
         <ellipse cx="156" cy="266" rx="16" ry="9" class="gloss" transform="rotate(-24 156 266)"/>
@@ -214,11 +175,8 @@ export function crocHTML(): string {
           <stop offset="0" stop-color="#3CCB4E"/><stop offset="1" stop-color="#128A28"/>
         </linearGradient>
       </defs>
-      <defs>${skinDefs(`${id}b`)}</defs>
       ${flapTeeth()}
       <path class="outline" fill="url(#${id}-flap)" d="M13 160 L13 ${ARC_Y} A162 162 0 0 0 347 ${ARC_Y} L347 160 Z"/>
-      ${skin(`M13 160 L13 ${ARC_Y} A162 162 0 0 0 347 ${ARC_Y} L347 160 Z`, `${id}b`)}
-      ${[[120, 240], [180, 228], [240, 240], [150, 290], [210, 290], [180, 342]].map(([x, y]) => knob(x, y, 10)).join('')}
       <ellipse cx="110" cy="236" rx="40" ry="10" class="gloss" transform="rotate(-20 110 236)"/>
     </svg>
     <svg class="croc-head" viewBox="0 0 ${W} ${H}" aria-hidden="true">
@@ -226,25 +184,13 @@ export function crocHTML(): string {
         <linearGradient id="${id}-up" x1="0" y1="0" x2="0" y2="1">
           <stop offset="0" stop-color="#43D355"/><stop offset=".55" stop-color="#1FAE36"/><stop offset="1" stop-color="#0E7F24"/>
         </linearGradient>
-        ${skinDefs(`${id}c`)}
       </defs>
       <g class="breathe">
         ${upperTeeth()}
-        ${[
-          [100, 44, 18, 9, -38], [124, 26, 22, 10, -22], [152, 16, 24, 10, -8], [180, 13, 28, 11, 0],
-          [208, 16, 24, 10, 8], [236, 26, 22, 10, 22], [260, 44, 18, 9, 38],
-        ]
-          .map(([x, y, h, w, r]) => spike(x, y + 8, h, w, r, `url(#${id}-up)`))
-          .join('')}
         <path d="${domePath}" fill="url(#${id}-up)" class="outline"/>
-        ${skin(domePath, `${id}c`)}
-        ${knob(150, 38, 8)}${knob(180, 32, 9)}${knob(210, 38, 8)}${knob(166, 54, 6)}${knob(194, 54, 6)}
-        <ellipse cx="150" cy="24" rx="30" ry="6" class="gloss" transform="rotate(-8 150 24)"/>
+        <ellipse cx="150" cy="30" rx="34" ry="8" class="gloss" transform="rotate(-8 150 30)"/>
         ${EYES.map(eye).join('')}
-        <ellipse cx="180" cy="102" rx="150" ry="16" class="cast-shadow"/>
         <path d="${snoutPath}" fill="url(#${id}-up)" class="outline"/>
-        ${skin(snoutPath, `${id}c`)}
-        ${knob(60, 128, 8)}${knob(300, 128, 8)}${knob(44, 154, 6)}${knob(316, 154, 6)}${knob(180, 108, 7)}${knob(160, 122, 5)}${knob(200, 122, 5)}
         <path d="M60 112 Q180 92 300 112" class="gloss-line wide"/>
         <path d="M180 112 L180 166" class="snout-groove"/>
         <g class="snout">${nostril(112, 0)}${nostril(248, 1)}</g>
