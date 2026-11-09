@@ -1,29 +1,29 @@
-/* Cá sấu — mõm dài, mắt híp, vảy giáp, viền hoạt hình. */
-.croc .outline { stroke: #16301A; stroke-width: 4; stroke-linejoin: round; }
-.croc .outline-thin { stroke: #16301A; stroke-width: 3; }
-.jaw-scales, .croc-flap .scutes { fill: #1F4220; opacity: .5; }
-.croc-head .scutes { fill: #2B5226; opacity: .55; }
-.snout-groove { fill: none; stroke: #2B5226; stroke-width: 3; opacity: .5; stroke-linecap: round; }
-.c-gum { fill: #B83C66; }
-.c-throat { fill: #1A030B; opacity: .6; }
-.c-tongue-line { fill: none; stroke: #7D2343; stroke-width: 4; stroke-linecap: round; }
-.c-tongue-shine { fill: #fff; opacity: .18; }
-.lip-tooth { fill: #F4EBD0; stroke: #BDAE82; stroke-width: 1.4; stroke-linejoin: round; }
-.lip-line { fill: none; stroke: #23461F; stroke-width: 3; opacity: .6; stroke-linecap: round; }
-.c-up-shade { fill: none; stroke: #2E5528; stroke-width: 6; stroke-linecap: round; opacity: .55; }
-.nose-bump { fill: #6E9E50; }
-.nostril-slit { fill: none; stroke: #0F2412; stroke-width: 4.5; stroke-linecap: round; }
-.brow-bumps { fill: #426F37; stroke: #16301A; stroke-width: 2.5; }
-.drool { fill: #D8F3F7; opacity: .75; }
-.eye-white { fill: #F1E7BE; }
-.eye-iris { fill: #D9C23B; }
-.eye-iris-ring { fill: none; stroke: #9C7A16; stroke-width: 2; }
-.eye-pupil { fill: #0E1A12; }
-.eyelid { fill: #4E8243; stroke: #16301A; stroke-width: 2.5; }
-.eye-rim { fill: none; stroke: #16301A; stroke-width: 3; }
-.croc.boss .eye-iris { fill: #FF5A4E; }
-.croc.boss .eye-iris-ring { stroke: #A3241B; }
-.croc.boss .eyelid { transform: translateY(2px); }
+/* Cá sấu hoạt hình dễ thương: oliu tươi, viền đen đậm, mắt tròn to, răng tròn. */
+.croc .outline { stroke: #1B1F0E; stroke-width: 4.5; stroke-linejoin: round; }
+.croc .outline-thin { stroke: #1B1F0E; stroke-width: 3; }
+.jaw-spots, .croc .spots { fill: #56731B; opacity: .7; }
+.croc .shine { fill: #C3DC6A; opacity: .55; }
+.bump-shine { fill: none; stroke: #C3DC6A; stroke-width: 4; stroke-linecap: round; opacity: .7; }
+.c-gum { fill: #E4DD94; }
+.c-throat { fill: #3A0712; opacity: .55; }
+.c-tongue-line { fill: none; stroke: #B8475C; stroke-width: 4; stroke-linecap: round; }
+.c-tongue-shine { fill: #fff; opacity: .3; }
+.lip-tooth { fill: #F7F0C8; stroke: #1B1F0E; stroke-width: 2.4; stroke-linejoin: round; }
+.smile { fill: none; stroke: #1B1F0E; stroke-width: 4; stroke-linecap: round; }
+.nostril { fill: #1B1F0E; }
+.eye-white { fill: #FFFFFF; }
+.eye-pupil { fill: #14160B; }
+.eyelid { fill: #8FAE3B; }
+.eye-rim { fill: none; stroke: #1B1F0E; stroke-width: 3.5; }
+.lid-line { fill: none; stroke: #1B1F0E; stroke-width: 3; stroke-linecap: round; }
+.boss-brow { display: none; fill: none; stroke: #1B1F0E; stroke-width: 7; stroke-linecap: round; }
+.croc.boss .boss-brow { display: inline; }
+.croc.boss .eye-pupil { fill: #B3141F; }
+.croc.boss .eyelid { fill: #6E8A27; transform: translateY(5px); }
+
+/* Răng hàm dưới cùng phong cách */
+.t-shape { fill: #F7F0C8; stroke: #1B1F0E; stroke-width: 2.4; }
+.tooth.down .t-shape { stroke: #3A4128; }
 
 /* Chuyển động "sống" */
 .breathe { transform-box: view-box; transform-origin: 180px 190px; animation: breathe 3.6s ease-in-out infinite; }
@@ -31,9 +31,7 @@
 .tongue { transform-box: view-box; transform-origin: 180px 370px; animation: tongue 2.8s ease-in-out infinite; }
 @keyframes tongue { 25% { transform: rotate(-2.5deg) scaleY(1.02); } 75% { transform: rotate(2.5deg); } }
 .snout { transform-box: fill-box; transform-origin: center; animation: sniff 4.2s ease-in-out infinite; }
-@keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.08, 1.04); } 82% { transform: none; } 88% { transform: scale(1.06, 1.03); } }
-.drool { transform-box: fill-box; transform-origin: 50% 0; animation: drool 3.2s ease-in-out infinite; }
-@keyframes drool { 0%, 100% { transform: scaleY(.6); opacity: .5; } 60% { transform: scaleY(1.25); opacity: .85; } }
-.croc.closed .tongue, .croc.closed .drool { animation-play-state: paused; }
-.croc.closed .drool { visibility: hidden; }
-.nostril { fill: #0F2412; }
+@keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.06, 1.04); } 82% { transform: none; } 88% { transform: scale(1.05, 1.03); } }
+.croc.closed .tongue { animation-play-state: paused; }
+.eyelid { display: none; }
+.croc.boss .eyelid { display: inline; }
