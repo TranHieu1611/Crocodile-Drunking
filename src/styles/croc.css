@@ -1,37 +1,33 @@
-/* Cá sấu hoạt hình dễ thương: oliu tươi, viền đen đậm, mắt tròn to, răng tròn. */
-.croc .outline { stroke: #1B1F0E; stroke-width: 4.5; stroke-linejoin: round; }
-.croc .outline-thin { stroke: #1B1F0E; stroke-width: 3; }
-.jaw-spots, .croc .spots { fill: #56731B; opacity: .7; }
-.croc .shine { fill: #C3DC6A; opacity: .55; }
-.bump-shine { fill: none; stroke: #C3DC6A; stroke-width: 4; stroke-linecap: round; opacity: .7; }
-.c-gum { fill: #E4DD94; }
-.c-throat { fill: #3A0712; opacity: .55; }
-.c-tongue-line { fill: none; stroke: #B8475C; stroke-width: 4; stroke-linecap: round; }
-.c-tongue-shine { fill: #fff; opacity: .3; }
-.lip-tooth { fill: #F7F0C8; stroke: #1B1F0E; stroke-width: 2.4; stroke-linejoin: round; }
-.smile { fill: none; stroke: #1B1F0E; stroke-width: 4; stroke-linecap: round; }
-.nostril { fill: #1B1F0E; }
-.eye-white { fill: #FFFFFF; }
-.eye-pupil { fill: #14160B; }
-.eyelid { fill: #8FAE3B; }
-.eye-rim { fill: none; stroke: #1B1F0E; stroke-width: 3.5; }
-.lid-line { fill: none; stroke: #1B1F0E; stroke-width: 3; stroke-linecap: round; }
-.boss-brow { display: none; fill: none; stroke: #1B1F0E; stroke-width: 7; stroke-linecap: round; }
-.croc.boss .boss-brow { display: inline; }
-.croc.boss .eye-pupil { fill: #B3141F; }
-.croc.boss .eyelid { fill: #6E8A27; transform: translateY(5px); }
+/* Cá sấu phong cách đồ chơi nhựa bóng. */
+.croc .outline { stroke: #075C17; stroke-width: 3.5; stroke-linejoin: round; }
+.croc .gloss { fill: #fff; opacity: .5; }
+.gloss-line { fill: none; stroke: #fff; stroke-width: 5; stroke-linecap: round; opacity: .4; }
+.gloss-line.wide { stroke-width: 7; opacity: .28; }
+.brow { stroke: #075C17; stroke-width: 3.5; stroke-linejoin: round; }
+.snout-groove { fill: none; stroke: #0B7020; stroke-width: 4; stroke-linecap: round; opacity: .6; }
+.c-lip { fill: #E8242B; stroke: #9E0E15; stroke-width: 3; }
+.c-throat { fill: #4A040A; opacity: .55; }
+.lip-red { fill: none; stroke: #E8242B; stroke-width: 7; stroke-linecap: round; opacity: .9; }
+.lip-tooth { fill: #FFFFFF; stroke: #C5CBD0; stroke-width: 1.5; stroke-linejoin: round; }
+.nostril { fill: #0B140C; }
+.nostril-glint { fill: #B9E63B; opacity: .9; }
+.eye-white { fill: #EAF7FA; }
+.eye-shade { fill: #BFE3EE; }
+.eye-iris { fill: #2FA63A; }
+.eye-pupil { fill: #0B140C; }
+.eye-rim { fill: none; stroke: #075C17; stroke-width: 3; }
+.croc.boss .eye-iris { fill: #E8242B; }
+.croc.boss .brow { transform: translateY(5px); }
 
-/* Răng hàm dưới cùng phong cách */
-.t-shape { fill: #F7F0C8; stroke: #1B1F0E; stroke-width: 2.4; }
-.tooth.down .t-shape { stroke: #3A4128; }
+/* Răng hàm dưới: trắng nhựa bóng */
+.t-shape { fill: #FFFFFF; stroke: #C5CBD0; stroke-width: 1.6; }
+.tooth.down .t-shape { stroke: #56614A; }
 
-/* Chuyển động "sống" */
+/* Chuyển động */
 .breathe { transform-box: view-box; transform-origin: 180px 190px; animation: breathe 3.6s ease-in-out infinite; }
 @keyframes breathe { 50% { transform: translateY(-2px) scale(1.01, .993); } }
-.tongue { transform-box: view-box; transform-origin: 180px 370px; animation: tongue 2.8s ease-in-out infinite; }
-@keyframes tongue { 25% { transform: rotate(-2.5deg) scaleY(1.02); } 75% { transform: rotate(2.5deg); } }
-.snout { transform-box: fill-box; transform-origin: center; animation: sniff 4.2s ease-in-out infinite; }
-@keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.06, 1.04); } 82% { transform: none; } 88% { transform: scale(1.05, 1.03); } }
+.tongue { transform-box: view-box; transform-origin: 180px 360px; animation: tongue 2.8s ease-in-out infinite; }
+@keyframes tongue { 25% { transform: rotate(-2deg) scaleY(1.02); } 75% { transform: rotate(2deg); } }
+.nostril-g { transform-box: fill-box; transform-origin: center; animation: sniff 4.2s ease-in-out infinite; }
+@keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.06); } 82% { transform: none; } 88% { transform: scale(1.05); } }
 .croc.closed .tongue { animation-play-state: paused; }
-.eyelid { display: none; }
-.croc.boss .eyelid { display: inline; }
