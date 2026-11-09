@@ -1,4 +1,4 @@
-import { CONFIG, type ToothKind } from './config';
+import { CONFIG, type ExerciseKind, type ToothKind } from './config';
 
 export interface Player {
   id: string;
@@ -18,13 +18,15 @@ export interface Settings {
   sound: boolean;
 }
 
-export type Reason = 'drink' | 'godsave' | 'hardDone' | 'hardFail' | 'buddyA' | 'buddyB' | 'buddyFree' | 'slow';
+export type Reason = 'drink' | 'godsave' | 'hardDone' | 'hardFail' | 'buddyA' | 'buddyB' | 'buddyFree' | 'slow' | 'partySelf' | 'partyAll' | 'pushup' | 'squat' | 'exerciseFail';
 
 export interface LogEntry {
   playerId: string;
   reason: Reason;
   ly: number;
   sips: number;
+  /** Số cái hít đất / squat (nếu có). */
+  reps?: number;
 }
 
 export interface Stats {
@@ -40,6 +42,8 @@ export interface Stats {
 
 export type Pending =
   | { kind: 'drink'; a: string; result?: 'save' | 'drink' }
+  | { kind: 'wheel'; a: string; result?: 'self' | 'all' }
+  | { kind: 'exercise'; ex: ExerciseKind; a: string; value?: number; angle?: number }
   | { kind: 'hard'; a: string; cardId: string; text: string; seconds: number; coupleHint: boolean; boss: boolean }
   | { kind: 'buddy'; a: string; b: string; cardId: string; text: string; seconds: number; boss: boolean };
 

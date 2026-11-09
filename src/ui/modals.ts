@@ -46,15 +46,19 @@ export function confirmBox(title: string, body: string, yes: string, no: string)
 export const SLIDES = [
   {
     t: 'Cá sấu có 12 răng',
-    b: 'Mỗi hàm, cá sấu giấu <b>4 răng độc</b> trong 12 răng. Bấm <b>Quay chọn người</b>, ai bị gọi tên có <b>5 giây</b> chọn 1 răng. Chậm tay → app chọn hộ và phạt thêm 1 ngụm.',
+    b: 'Mỗi hàm, cá sấu giấu <b>7 răng độc</b> trong 12 răng. Bấm <b>Quay chọn người</b>, ai bị gọi tên có <b>5 giây</b> chọn 1 răng. Chậm tay → app chọn hộ và phạt thêm 1 ngụm.',
   },
   {
     t: 'Răng Uống ×2',
     b: 'Dính răng đỏ: hàm sập, <b>quay vòng may mắn</b>. Trúng ô <b>GOD SAVE (10%)</b> thì thoát, còn lại uống <b>1 ly</b>.',
   },
   {
-    t: 'Cực Khó ×1 · Uống Cùng ×1',
-    b: 'Răng tím: rút 1 <b>thử thách cực khó</b>. Làm được thì qua, chịu thua thì uống <b>2 ly</b>.<br><br>Răng vàng: bạn chắc chắn uống 1 ly, app <b>kéo thêm 1 người</b> làm thử thách cùng. Cả bàn bỏ phiếu cho người bị kéo có thoát hay không.',
+    t: 'Cực Khó · Uống Cùng · Vòng Quay',
+    b: 'Răng tím: rút 1 <b>thử thách cực khó</b>. Làm được thì qua, chịu thua thì uống <b>2 ly</b>.<br><br>Răng vàng: bạn chắc chắn uống 1 ly, app <b>kéo thêm 1 người</b> làm thử thách cùng. Cả bàn bỏ phiếu cho người bị kéo có thoát hay không.<br><br>Răng cam: <b>quay vòng</b> — trúng <b>MÌNH UỐNG</b> thì bạn uống 1 ly, trúng <b>CẢ BÀN</b> thì cả bàn cùng dzô!',
+  },
+  {
+    t: 'Hít Đất · Squat',
+    b: 'Răng xanh dương: quay ra số cái <b>hít đất (1–5)</b>. Răng hồng: quay ra số cái <b>squat (4–10)</b>.<br><br>Cả bàn đếm to. Không làm nổi thì <b>uống 1 ly</b> thay thế.',
   },
   {
     t: 'Hàm Trùm & an toàn',

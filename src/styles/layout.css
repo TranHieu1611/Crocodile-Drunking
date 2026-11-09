@@ -92,7 +92,7 @@ kbd {
 .art-wheel b { font-family: var(--f-title); font-size: 30px; color: var(--yellow); line-height: 1; margin-top: 10px; }
 .art-wheel span { font-size: 12px; font-weight: 800; letter-spacing: .12em; color: var(--muted); }
 @keyframes spinSlow { to { transform: rotate(360deg); } }
-.art-pair { display: flex; gap: 36px; }
+.art-pair { display: flex; gap: 24px; }
 .art-pair > div { display: flex; flex-direction: column; align-items: center; gap: 4px; }
 .art-pair .rt { width: 64px; height: 70px; }
 .art-pair b { font-family: var(--f-title); font-size: 24px; line-height: 1.1; }
@@ -180,7 +180,7 @@ kbd {
   .action .ring { width: 64px; height: 64px; }
   .bet { font-size: 14px; }
   .game .msg { justify-content: flex-start; text-align: left; font-size: 16px; min-height: 48px; }
-  .game .legend { justify-content: flex-start; flex-wrap: wrap; font-size: 13px; margin-top: auto; }
+
   .keys { order: 7; font-size: 12.5px; color: var(--muted); line-height: 2; }
   .gh-stat .lbl { font-size: 13px; }
   .game .croc-host { height: 100%; }

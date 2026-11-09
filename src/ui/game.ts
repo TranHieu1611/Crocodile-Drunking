@@ -1,4 +1,4 @@
-import { CONFIG } from '../config';
+import { CONFIG, POISON_KINDS, type PoisonKind } from '../config';
 import { avatar, esc, icon, nameChip, reducedMotion, wait } from './dom';
 import { Croc, crocHTML } from './croc';
 import { ringHTML, setRing } from './fx';
@@ -7,7 +7,7 @@ import { showOverlay, type Outcome } from './overlays';
 import { store, persist, nav, cardData, saveRoster } from './store';
 import {
   POISON_TOTAL, addLog, dangerPct, drawBuddy, drawHard, isBossRound, pickOne, pickPlayer, playerById,
-  poisonLeft, randomFreeTooth, revealTooth, roundOver, waterize,
+  poisonByKind, poisonLeft, randomFreeTooth, revealTooth, roundOver, waterize,
 } from '../engine';
 import { sfx, vibrate, startHeartbeat, stopHeartbeat, setSound, unlockAudio } from '../audio';
 import type { Pending } from '../state';
@@ -73,11 +73,7 @@ export function renderGame(host: HTMLElement): void {
     <div class="pbar n${Math.min(g.players.length, 12)}"></div>
     <div class="action"></div>
     <p class="msg" aria-live="polite"></p>
-    <div class="legend">
-      <span><i class="dot drink"></i>Uống ×2</span>
-      <span><i class="dot hard"></i>Cực khó ×1</span>
-      <span><i class="dot buddy"></i>Uống cùng ×1</span>
-    </div>
+    <div class="legend" aria-label="Răng độc còn lại"></div>
     <p class="keys only-d"><kbd>Space</kbd> quay chọn người · <kbd>1</kbd>–<kbd>9</kbd> <kbd>0</kbd> <kbd>-</kbd> <kbd>=</kbd> chọn răng · <kbd>Esc</kbd> menu</p>
     </div>
     <div class="croc-host">${crocHTML()}${boss ? `<div class="boss-banner"><span>HÀM TRÙM</span><small>Thẻ nặng đô đã được thả ra</small></div>` : ''}</div>
@@ -121,6 +117,28 @@ export function renderGame(host: HTMLElement): void {
   }
 }
 
+const KIND_INFO: Record<PoisonKind, { name: string; desc: string }> = {
+  drink: { name: 'Răng Uống', desc: 'Quay God Save 10%, trượt thì 1 ly' },
+  hard: { name: 'Cực Khó', desc: 'Thử thách, chịu thua 2 ly' },
+  buddy: { name: 'Uống Cùng', desc: 'Uống 1 ly + kéo thêm 1 người' },
+  wheel: { name: 'Vòng Quay', desc: 'Mình uống hoặc cả bàn uống' },
+  pushup: { name: 'Hít Đất', desc: 'Quay ra 1–5 cái' },
+  squat: { name: 'Squat', desc: 'Quay ra 4–10 cái' },
+};
+
+/** Chú thích: còn lại răng độc loại nào. */
+function drawLegend(): void {
+  const el = root.querySelector('.legend');
+  if (!el) return;
+  const by = poisonByKind(store.g!);
+  el.innerHTML =
+    `<p class="lgd-title only-d">Răng độc còn lại</p>` +
+    POISON_KINDS.map((k) => {
+      const { left, total } = by[k];
+      return `<div class="lgd${left === 0 ? ' done' : ''}" title="${KIND_INFO[k].name}: ${KIND_INFO[k].desc}"><i class="dot ${k}"></i><span class="lgd-m"><b>${KIND_INFO[k].name}</b><small class="only-d">${KIND_INFO[k].desc}</small></span><span class="lgd-n">${left}/${total}</span></div>`;
+    }).join('');
+}
+
 function setMsg(html: string): void {
   const el = root.querySelector('.msg');
   if (el) el.innerHTML = html;
@@ -136,6 +154,7 @@ function refresh(): void {
   dEl.classList.toggle('hot', hot);
   if (hot && !paused && g.settings.sound) startHeartbeat();
   else stopHeartbeat();
+  drawLegend();
   drawPlayers();
   drawAction();
   croc?.sync(g.round.teeth, g.round.revealed, g.phase === 'picking' && !busy && !paused);
@@ -261,6 +280,8 @@ async function choose(idx: number, slow: boolean): Promise<void> {
   const boss = isBossRound(g.round.n, g.settings);
   let pending: Pending;
   if (kind === 'drink') pending = { kind: 'drink', a: a.id };
+  else if (kind === 'wheel') pending = { kind: 'wheel', a: a.id };
+  else if (kind === 'pushup' || kind === 'squat') pending = { kind: 'exercise', ex: kind, a: a.id };
   else if (kind === 'hard') {
     const { card, coupleHint } = drawHard(g, data, a.id);
     pending = { kind: 'hard', a: a.id, cardId: card.id, text: card.text, seconds: card.seconds, coupleHint, boss: boss && !!card.boss };
@@ -323,7 +344,24 @@ async function finish(p: Pending, o: Outcome): Promise<void> {
       addLog(g, a.id, 'hardFail', CONFIG.HARD_FAIL_DRINKS);
       msg = `${nameChip(a)} chịu thua, ${esc(waterize(`uống ${CONFIG.HARD_FAIL_DRINKS} ly`, a.water))}.`;
     }
-  } else if (p.kind === 'buddy') {
+  } else if (o.kind === 'exercise') {
+    const verb = o.ex === 'pushup' ? 'hít đất' : 'squat';
+    if (o.done) {
+      addLog(g, a.id, o.ex, 0, 0, o.value);
+      msg = `${nameChip(a)} đã ${verb} ${o.value} cái — khoẻ!`;
+    } else {
+      addLog(g, a.id, 'exerciseFail', 1);
+      msg = `${nameChip(a)} không ${verb} nổi, ${esc(waterize('uống 1 ly', a.water))}.`;
+    }
+  } else if (o.kind === 'wheel') {
+    if (o.all) {
+      for (const x of g.players) addLog(g, x.id, 'partyAll', 1);
+      msg = `<b>Cả bàn cùng uống!</b> ${nameChip(a)} quay trúng ô CẢ BÀN.`;
+    } else {
+      addLog(g, a.id, 'partySelf', 1);
+      msg = `${nameChip(a)} ${esc(waterize('uống 1 ly', a.water))} một mình.`;
+    }
+  } else if (p.kind === 'buddy' && o.kind === 'buddy') {
     const b = playerById(g, p.b);
     addLog(g, a.id, 'buddyA', 1);
     if (o.ok) {

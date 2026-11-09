@@ -2,6 +2,7 @@ import { describe, it, expect } from 'vitest';
 import {
   createGame, makeTeeth, revealTooth, pickPlayer, roundOver, poisonLeft, nextRound, spinGodSave,
   drawHard, drawBuddy, mentionedPlayers, isBossRound, waterize, dangerPct, fillText, randomFreeTooth,
+  spinParty, partySliceIsAll, poisonByKind, POISON_TOTAL, spinCount, repsValues,
 } from '../src/engine';
 import { BASE_CARDS, type Card, type CardData } from '../src/cards';
 import { DEFAULT_SETTINGS, type Player, type Settings } from '../src/state';
@@ -27,15 +28,19 @@ function players(n: number, couple: (i: number) => boolean = () => false): Playe
 const S = (o: Partial<Settings> = {}): Settings => ({ ...DEFAULT_SETTINGS, ...o });
 
 describe('hàm cá sấu', () => {
-  it('luôn đúng 12 răng với 4 răng độc (2/1/1)', () => {
+  it('luôn đúng 12 răng với 7 răng độc (uống 2, cực khó, uống cùng, vòng quay, hít đất, squat)', () => {
     const rng = seeded(1);
+    expect(POISON_TOTAL).toBe(7);
     for (let i = 0; i < 2000; i++) {
       const t = makeTeeth(rng);
       expect(t.length).toBe(12);
       expect(t.filter((k) => k === 'drink').length).toBe(2);
       expect(t.filter((k) => k === 'hard').length).toBe(1);
       expect(t.filter((k) => k === 'buddy').length).toBe(1);
-      expect(t.filter((k) => k === 'safe').length).toBe(8);
+      expect(t.filter((k) => k === 'wheel').length).toBe(1);
+      expect(t.filter((k) => k === 'pushup').length).toBe(1);
+      expect(t.filter((k) => k === 'squat').length).toBe(1);
+      expect(t.filter((k) => k === 'safe').length).toBe(5);
     }
   });
 
@@ -46,7 +51,7 @@ describe('hàm cá sấu', () => {
     for (const h of hits) expect(h / 12000).toBeGreaterThan(0.3);
   });
 
-  it('hàm kết thúc đúng khi đủ 4 răng độc', () => {
+  it('hàm kết thúc đúng khi đủ 7 răng độc', () => {
     const rng = seeded(3);
     for (let r = 0; r < 300; r++) {
       const g = createGame(players(8), S(), rng);
@@ -55,22 +60,22 @@ describe('hàm cá sấu', () => {
         pickPlayer(g, rng);
         const k = revealTooth(g, randomFreeTooth(g, rng));
         if (k !== 'safe') poison++;
-        expect(poisonLeft(g)).toBe(4 - poison);
+        expect(poisonLeft(g)).toBe(7 - poison);
       }
-      expect(poison).toBe(4);
+      expect(poison).toBe(7);
       nextRound(g, rng);
       expect(g.round.n).toBe(2);
-      expect(poisonLeft(g)).toBe(4);
+      expect(poisonLeft(g)).toBe(7);
     }
   });
 
   it('nguy cơ % = răng độc còn / răng còn', () => {
     const g = createGame(players(4), S(), seeded(4));
-    expect(dangerPct(g)).toBe(33);
+    expect(dangerPct(g)).toBe(58);
     g.current = 'p0';
     const safe = g.round.teeth.indexOf('safe');
     revealTooth(g, safe);
-    expect(dangerPct(g)).toBe(Math.round((4 / 11) * 100));
+    expect(dangerPct(g)).toBe(Math.round((7 / 11) * 100));
   });
 
   it('không chọn trùng người liên tiếp', () => {
@@ -213,5 +218,51 @@ describe('văn bản', () => {
     expect(waterize('Uống 1 ly', true)).toBe('Uống 1 ly nước lọc');
     expect(waterize('uống thêm 1 ngụm vì chậm', true)).toBe('uống thêm 1 ly nước lọc vì chậm');
     expect(waterize('uống 2 ly', false)).toBe('uống 2 ly');
+  });
+});
+
+describe('Răng Vòng Quay', () => {
+  it('xấp xỉ 50/50 và kim luôn dừng đúng loại ô', () => {
+    const rng = seeded(9);
+    let all = 0;
+    for (let i = 0; i < 10000; i++) {
+      const r = spinParty(rng);
+      expect(partySliceIsAll(r.angle)).toBe(r.all);
+      if (r.all) all++;
+    }
+    expect(all / 10000).toBeGreaterThan(0.47);
+    expect(all / 10000).toBeLessThan(0.53);
+  });
+
+  it('đếm răng độc còn lại theo loại', () => {
+    const g = createGame(players(4), S(), seeded(10));
+    g.current = 'p0';
+    revealTooth(g, g.round.teeth.indexOf('wheel'));
+    const by = poisonByKind(g);
+    expect(by.wheel).toEqual({ left: 0, total: 1 });
+    expect(by.drink).toEqual({ left: 2, total: 2 });
+    expect(by.hard).toEqual({ left: 1, total: 1 });
+  });
+});
+
+describe('Răng Hít Đất / Squat', () => {
+  it('quay ra đúng dải số, mỗi số xuất hiện đều và kim nằm trong ô của số đó', () => {
+    const rng = seeded(11);
+    for (const ex of ['pushup', 'squat'] as const) {
+      const values = repsValues(ex);
+      const hits = new Map<number, number>();
+      const step = 360 / values.length;
+      for (let i = 0; i < 7000; i++) {
+        const r = spinCount(values, rng);
+        expect(values).toContain(r.value);
+        expect(Math.floor(r.angle / step)).toBe(r.index);
+        expect(values[r.index]).toBe(r.value);
+        hits.set(r.value, (hits.get(r.value) ?? 0) + 1);
+      }
+      expect([...hits.keys()].sort((a, b) => a - b)).toEqual([...values]);
+      for (const n of hits.values()) expect(n / 7000).toBeGreaterThan(1 / values.length - 0.03);
+    }
+    expect(repsValues('pushup')).toEqual([1, 2, 3, 4, 5]);
+    expect(repsValues('squat')).toEqual([4, 5, 6, 7, 8, 9, 10]);
   });
 });

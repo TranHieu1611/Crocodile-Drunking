@@ -12,7 +12,9 @@ function amount(ly: number, sips: number, water: boolean): string {
 }
 
 function reasonChips(entries: LogEntry[]): string {
-  return entries.map((e) => `<span class="chip r-${e.reason}">${REASON_LABEL[e.reason]}</span>`).join('');
+  return entries
+    .map((e) => `<span class="chip r-${e.reason}">${REASON_LABEL[e.reason]}${e.reps ? ` ×${e.reps}` : ''}</span>`)
+    .join('');
 }
 
 export function renderRoundEnd(root: HTMLElement): void {

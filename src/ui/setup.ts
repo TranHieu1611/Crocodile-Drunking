@@ -53,11 +53,14 @@ export function renderSetup(root: HTMLElement): void {
 
     <div class="setup-side">
     <div class="info">
-      <div class="info-title">${icon('tooth', 18)} 4 răng độc mỗi hàm</div>
+      <div class="info-title">${icon('tooth', 18)} 7 răng độc mỗi hàm</div>
       <ul>
         <li><i class="dot drink"></i><b>Uống ×2</b> — God Save 10%</li>
         <li><i class="dot hard"></i><b>Cực khó ×1</b> — thua 2 ly</li>
         <li><i class="dot buddy"></i><b>Uống cùng ×1</b> — kéo 1 người</li>
+        <li><i class="dot wheel"></i><b>Vòng quay ×1</b> — mình uống hoặc cả bàn</li>
+        <li><i class="dot pushup"></i><b>Hít đất ×1</b> — quay 1–5 cái</li>
+        <li><i class="dot squat"></i><b>Squat ×1</b> — quay 4–10 cái</li>
       </ul>
     </div>
 

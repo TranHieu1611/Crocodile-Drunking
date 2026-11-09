@@ -3,6 +3,8 @@ import './styles/app.css';
 import './styles/layout.css';
 import './styles/croc.css';
 import './styles/swamp.css';
+import './styles/wheel.css';
+import './styles/exercise.css';
 import { store, setNav, loadRoster, type Screen } from './ui/store';
 import { renderIntro, renderRulesPage, leaveIntro } from './ui/intro';
 import { renderSetup } from './ui/setup';

@@ -52,6 +52,8 @@ const ICONS: Record<string, string> = {
   trash: '<path d="M4 7h16M9 7V4h6v3M6 7l1 13h10l1-13"/>',
   water: '<path d="M12 3s6 7 6 11a6 6 0 0 1-12 0c0-4 6-11 6-11z"/>',
   heart: '<path d="M12 20s-7-4.5-7-10a4 4 0 0 1 7-2.6A4 4 0 0 1 19 10c0 5.5-7 10-7 10z"/>',
+  pushup: '<circle cx="19" cy="8" r="2"/><path d="M3 19h18M4 17l12-5 2 1M9 15v4M16 12l1 7"/>',
+  squat: '<circle cx="12" cy="4" r="2"/><path d="M6 9h12M12 6v6l-4 3v5M12 12l4 3v5"/>',
   tooth: '<path d="M6 4c2-1.5 4 0 6 0s4-1.5 6 0c2 1.6 1.5 5-0.5 8-1 1.6-1 8-3 8s-1.5-5-2.5-5-0.5 5-2.5 5-2-6.4-3-8C4.5 9 4 5.6 6 4z"/>',
 };
 

@@ -1,0 +1,41 @@
+/* ===== Răng Hít Đất / Squat ===== */
+:root { --pushup: #4FC3F7; --pushup-bg: #04202B; --squat: #F06292; --squat-bg: #2A0716; }
+.dot.pushup, .sw.pushup { background: var(--pushup); }
+.dot.squat, .sw.squat { background: var(--squat); }
+.ov-pushup .modal-box { background: var(--pushup-bg); --k: var(--pushup); --kbg: var(--pushup-bg); }
+.ov-squat .modal-box { background: var(--squat-bg); --k: var(--squat); --kbg: var(--squat-bg); }
+.btn.ex-btn { background: var(--k); color: var(--kbg); font-weight: 800; }
+.res.ex b { color: var(--k); }
+.ov-ex .ov-sure b { color: var(--k); }
+.cw-pushup { fill: var(--pushup); }
+.cw-pushup.alt { fill: #2A9FD6; }
+.cw-squat { fill: var(--squat); }
+.cw-squat.alt { fill: #D2477A; }
+.cw .cw-num, .cw .cw-unit { fill: #0B1620; }
+.cw.squat .cw-num, .cw.squat .cw-unit { fill: #2A0716; }
+.cw .cw-unit { font-family: var(--f-body); font-weight: 800; letter-spacing: 1px; }
+.tooth.bad[data-kind="pushup"] .t-shape { fill: var(--pushup); stroke: #2A86B3; }
+.tooth.bad[data-kind="pushup"] { color: var(--pushup); }
+.tooth.bad[data-kind="squat"] .t-shape { fill: var(--squat); stroke: #A8335E; }
+.tooth.bad[data-kind="squat"] { color: var(--squat); }
+.flash-screen.k-pushup { background: var(--pushup); }
+.flash-screen.k-squat { background: var(--squat); }
+.chip.r-pushup { background: var(--pushup); color: var(--pushup-bg); }
+.chip.r-squat { background: var(--squat); color: var(--squat-bg); }
+.chip.r-exerciseFail { background: #3A4A3E; color: var(--text); }
+
+.ai.pushup { color: var(--pushup); }
+.ai.squat { color: var(--squat); }
+.ai b { font-family: var(--f-title); font-size: 24px; line-height: 1; color: var(--text); }
+
+/* Chú thích 6 loại: mobile 3 cột × 2 hàng */
+.legend { grid-template-columns: repeat(3, 1fr); }
+@media (min-width: 900px) {
+  /* 6 loại → lưới 2 cột gọn */
+  .legend { display: grid; grid-template-columns: 1fr 1fr; gap: 6px; }
+  .lgd-title { grid-column: 1 / -1; }
+  .lgd { padding: 7px 10px; gap: 8px; }
+  .lgd-m small { font-size: 11px; line-height: 1.3; }
+  .lgd-m b { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .lgd-n { font-size: 19px; }
+}

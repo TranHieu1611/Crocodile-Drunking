@@ -6,9 +6,9 @@ Hello
 
 ## Cách chơi
 
-- Cá sấu có 12 răng, mỗi hàm giấu 4 răng độc: **Uống ×2** (vòng quay God Save 10%), **Cực khó ×1** (thua uống 2 ly), **Uống cùng ×1** (kéo thêm 1 người).
+- Cá sấu có 12 răng, mỗi hàm giấu 7 răng độc: **Uống ×2** (vòng quay God Save 10%), **Cực khó ×1** (thua uống 2 ly), **Uống cùng ×1** (kéo thêm 1 người), **Vòng quay ×1** (quay ra mình uống hoặc cả bàn cùng uống), **Hít đất ×1** (quay 1–5 cái), **Squat ×1** (quay 4–10 cái; không nổi thì uống 1 ly).
 - Bấm **Quay chọn người** → người được gọi tên có 5 giây chọn 1 răng. Chậm tay thì app chọn hộ và phạt 1 ngụm.
-- Dính đủ 4 răng độc thì hết hàm. Cứ 3 hàm có 1 **Hàm Trùm** với thẻ nặng đô hơn.
+- Dính đủ 7 răng độc thì hết hàm. Cứ 3 hàm có 1 **Hàm Trùm** với thẻ nặng đô hơn.
 - Thẻ đụng chạm chỉ rút cho người bật **OK cặp**; ai lái xe thì bật **nước lọc**. Uống có trách nhiệm!
 
 ## Chạy & build

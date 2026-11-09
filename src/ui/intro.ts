@@ -25,11 +25,14 @@ export function renderIntro(root: HTMLElement): void {
     <div class="intro-copy">
       <p class="intro-kicker">Game nhậu · 2–12 người</p>
       <h1 class="intro-title"><span>Răng</span><span>Cá Sấu</span></h1>
-      <p class="intro-tag">12 cái răng. <b>4 cái có độc.</b><br>Tới lượt bạn thò tay vào miệng nó.</p>
+      <p class="intro-tag">12 cái răng. <b>7 cái có độc.</b><br>Tới lượt bạn thò tay vào miệng nó.</p>
       <ul class="intro-pills">
         <li><i class="dot drink"></i>Uống</li>
         <li><i class="dot hard"></i>Cực khó</li>
         <li><i class="dot buddy"></i>Kéo bạn uống cùng</li>
+        <li><i class="dot wheel"></i>Vòng quay cả bàn</li>
+        <li><i class="dot pushup"></i>Hít đất</li>
+        <li><i class="dot squat"></i>Squat</li>
       </ul>
       <div class="intro-cta">
         <button class="btn primary big pulse" data-go>Vào chơi ${icon('right')}</button>
@@ -133,14 +136,16 @@ function tooth(color: string, extra = ''): string {
 
 const ART = [
   () => {
-    const kinds = ['safe', 'drink', 'safe', 'safe', 'hard', 'safe', 'drink', 'safe', 'safe', 'buddy', 'safe', 'safe'];
-    const col: Record<string, string> = { safe: '#F4EBD0', drink: '#FF5A4E', hard: '#C084FC', buddy: '#FFC93C' };
+    const kinds = ['safe', 'drink', 'pushup', 'safe', 'hard', 'safe', 'drink', 'squat', 'safe', 'buddy', 'wheel', 'safe'];
+    const col: Record<string, string> = { safe: '#F4EBD0', drink: '#FF5A4E', hard: '#C084FC', buddy: '#FFC93C', wheel: '#FF9F43', pushup: '#4FC3F7', squat: '#F06292' };
     return `<div class="art-teeth">${kinds.map((k, i) => `<span style="animation-delay:${i * 60}ms">${tooth(col[k])}</span>`).join('')}</div>`;
   },
   () =>
     `<div class="art-wheel"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#FF5A4E"/><path d="M60 60 L60 4 A56 56 0 0 1 92.9 14.7 Z" fill="#FFC93C"/><circle cx="60" cy="60" r="56" fill="none" stroke="#FFF6E8" stroke-width="4"/><circle cx="60" cy="60" r="9" fill="#FFF6E8"/></svg><b>10%</b><span>GOD SAVE</span></div>`,
   () =>
-    `<div class="art-pair"><div>${tooth('#C084FC')}<b>2 ly</b><span>nếu chịu thua</span></div><div>${tooth('#FFC93C')}<b>+1 người</b><span>bị kéo theo</span></div></div>`,
+    `<div class="art-pair"><div>${tooth('#C084FC')}<b>2 ly</b><span>nếu chịu thua</span></div><div>${tooth('#FFC93C')}<b>+1 người</b><span>bị kéo theo</span></div><div>${tooth('#FF9F43')}<b>Cả bàn?</b><span>quay mới biết</span></div></div>`,
+  () =>
+    `<div class="art-icons"><div class="ai pushup">${icon('pushup', 34)}<b>1–5</b><span>Hít đất</span></div><div class="ai squat">${icon('squat', 34)}<b>4–10</b><span>Squat</span></div></div>`,
   () =>
     `<div class="art-icons"><div class="ai boss">${icon('flag', 30)}<span>Hàm Trùm</span></div><div class="ai couple">${icon('heart', 30)}<span>OK cặp</span></div><div class="ai water">${icon('water', 30)}<span>Nước lọc</span></div></div>`,
 ];

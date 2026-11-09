@@ -266,8 +266,6 @@ code { background: var(--surface2); padding: 0 4px; border-radius: 4px; font-siz
 .croc-host { position: relative; flex: 1; min-height: 0; display: flex; align-items: center; justify-content: center; container-type: size; }
 .msg { min-height: 40px; text-align: center; font-size: 15px; font-weight: 600; line-height: 1.4; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 0 4px; padding: 0 4px; }
 .msg .warn { color: var(--red); }
-.legend { display: flex; justify-content: center; gap: 14px; font-size: 12px; color: var(--muted); }
-.legend span { display: inline-flex; align-items: center; gap: 5px; }
 
 /* ---------- Cá sấu ---------- */
 .croc {
@@ -523,7 +521,7 @@ code { background: var(--surface2); padding: 0 4px; border-radius: 4px; font-siz
 /* ---------- Màn thấp (iPhone SE) ---------- */
 @media (max-height: 700px) {
   .game { gap: 5px; padding-top: 8px; }
-  .legend { display: none; }
+  .lgd { padding: 3px 2px; }
   .action { min-height: 74px; }
   .spin-btn { min-height: 54px; }
   .call-t { font-size: 16px; }

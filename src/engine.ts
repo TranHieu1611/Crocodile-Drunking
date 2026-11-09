@@ -1,5 +1,5 @@
 // Logic thuần — KHÔNG đụng DOM.
-import { CONFIG, type ToothKind } from './config';
+import { CONFIG, POISON_KINDS, type ExerciseKind, type PoisonKind, type ToothKind } from './config';
 import { mentions, type Card, type CardData, type DeckName } from './cards';
 import { emptyStats, type GameState, type LogEntry, type Player, type Reason, type Settings } from './state';
 
@@ -25,11 +25,14 @@ export function makeTeeth(rng: Rng): ToothKind[] {
   for (let i = 0; i < CONFIG.POISON.drink; i++) t.push('drink');
   for (let i = 0; i < CONFIG.POISON.hard; i++) t.push('hard');
   for (let i = 0; i < CONFIG.POISON.buddy; i++) t.push('buddy');
+  for (let i = 0; i < CONFIG.POISON.wheel; i++) t.push('wheel');
+  for (let i = 0; i < CONFIG.POISON.pushup; i++) t.push('pushup');
+  for (let i = 0; i < CONFIG.POISON.squat; i++) t.push('squat');
   while (t.length < CONFIG.TEETH) t.push('safe');
   return shuffle(t, rng);
 }
 
-export const POISON_TOTAL = CONFIG.POISON.drink + CONFIG.POISON.hard + CONFIG.POISON.buddy;
+export const POISON_TOTAL = Object.values(CONFIG.POISON).reduce((s, n) => s + n, 0);
 
 export function isBossRound(n: number, s: Settings): boolean {
   return s.boss && n % CONFIG.BOSS_INTERVAL === 0;
@@ -62,6 +65,18 @@ export function nextRound(g: GameState, rng: Rng = Math.random): void {
 
 export function poisonLeft(g: GameState): number {
   return g.round.teeth.filter((k, i) => k !== 'safe' && !g.round.revealed[i]).length;
+}
+
+/** Răng độc còn lại / tổng, theo từng loại. */
+export function poisonByKind(g: GameState): Record<PoisonKind, { left: number; total: number }> {
+  const out = {} as Record<PoisonKind, { left: number; total: number }>;
+  for (const k of POISON_KINDS) out[k] = { left: 0, total: 0 };
+  g.round.teeth.forEach((k, i) => {
+    if (k === 'safe') return;
+    out[k].total++;
+    if (!g.round.revealed[i]) out[k].left++;
+  });
+  return out;
 }
 
 export function teethLeft(g: GameState): number {
@@ -103,8 +118,7 @@ export function playerById(g: GameState, id: string): Player {
 
 // ---------- Ghi nhận ----------
 
-export function addLog(g: GameState, playerId: string, reason: Reason, ly = 0, sips = 0): void {
-  const e: LogEntry = { playerId, reason, ly, sips };
+export function addLog(g: GameState, playerId: string, reason: Reason, ly = 0, sips = 0, reps?: number): void {  const e: LogEntry = { playerId, reason, ly, sips, ...(reps ? { reps } : {}) };
   g.round.log.push(e);
   const s = (g.stats[playerId] ??= {
     bitten: 0, godSaves: 0, hardDone: 0, hardFail: 0, dragged: 0, slow: 0, ly: 0, sips: 0,
@@ -149,6 +163,32 @@ export function spinGodSave(rng: Rng = Math.random): SpinResult {
   const pad = 3;
   const angle = save ? pad + rng() * (slice - 2 * pad) : slice + pad + rng() * (360 - slice - 2 * pad);
   return { save, angle };
+}
+
+// ---------- Vòng quay "Răng Vòng Quay" ----------
+
+/** Số ô trên bánh xe Vòng Quay; ô chẵn = tự uống, ô lẻ = cả bàn uống. */
+export const PARTY_SLICES = 6;
+
+export interface PartySpin {
+  all: boolean;
+  /** Góc kim dừng (độ, 0 = đỉnh, theo chiều kim đồng hồ). */
+  angle: number;
+}
+
+export function spinParty(rng: Rng = Math.random): PartySpin {
+  const all = rng() < CONFIG.PARTY_CHANCE;
+  const step = 360 / PARTY_SLICES;
+  const pad = 9;
+  // Chọn ngẫu nhiên 1 ô đúng loại rồi 1 góc bên trong ô đó.
+  const k = Math.floor(rng() * (PARTY_SLICES / 2)) * 2 + (all ? 1 : 0);
+  const angle = k * step + pad + rng() * (step - 2 * pad);
+  return { all, angle };
+}
+
+/** Ô nào đang nằm dưới kim ở góc `angle`. */
+export function partySliceIsAll(angle: number): boolean {
+  return Math.floor((((angle % 360) + 360) % 360) / (360 / PARTY_SLICES)) % 2 === 1;
 }
 
 // ---------- Thẻ ----------
@@ -265,6 +305,11 @@ export const REASON_LABEL: Record<Reason, string> = {
   buddyA: 'Răng Uống Cùng',
   buddyB: 'Bị kéo uống cùng',
   buddyFree: 'Bị kéo nhưng thoát',
+  partySelf: 'Vòng Quay — tự uống',
+  partyAll: 'Vòng Quay — cả bàn uống',
+  pushup: 'Hít đất',
+  squat: 'Squat',
+  exerciseFail: 'Không nổi → uống',
   slow: 'Chậm tay',
 };
 
@@ -313,4 +358,26 @@ export function sessionAwards(g: GameState): Award[] {
   return defs
     .map(([emoji, title, f, min, unit]) => ({ emoji, title, unit, ...best(f, min) }))
     .filter((a) => a.title === 'Bất Tử' || a.value > 0);
+}
+
+// ---------- Vòng quay số cái (hít đất / squat) ----------
+
+export interface CountSpin {
+  value: number;
+  index: number;
+  /** Góc kim dừng (độ, 0 = đỉnh, theo chiều kim đồng hồ). */
+  angle: number;
+}
+
+/** Quay đều giữa các ô `values`; trả về giá trị và góc nằm gọn trong ô đó. */
+export function spinCount(values: readonly number[], rng: Rng = Math.random): CountSpin {
+  const index = Math.floor(rng() * values.length);
+  const step = 360 / values.length;
+  const pad = Math.min(8, step / 5);
+  const angle = index * step + pad + rng() * (step - 2 * pad);
+  return { value: values[index], index, angle };
+}
+
+export function repsValues(ex: ExerciseKind): readonly number[] {
+  return CONFIG.REPS[ex];
 }
