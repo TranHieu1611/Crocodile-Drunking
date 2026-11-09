@@ -22,7 +22,8 @@ export function modal(html: string, cls = 'sheet', dismissable = true): ModalHan
   };
   if (dismissable) el.querySelector('.modal-back')!.addEventListener('click', close);
   el.querySelectorAll('[data-close]').forEach((b) => b.addEventListener('click', close));
-  const focusable = el.querySelector<HTMLElement>('.modal-box .btn.primary, .modal-box button, .modal-box input');
+  const focusable =
+    el.querySelector<HTMLElement>('.modal-box .btn.primary') ?? el.querySelector<HTMLElement>('.modal-box button, .modal-box input');
   focusable?.focus({ preventScroll: true });
   return { el, close };
 }
@@ -42,7 +43,7 @@ export function confirmBox(title: string, body: string, yes: string, no: string)
 
 // ---------- Luật chơi ----------
 
-const SLIDES = [
+export const SLIDES = [
   {
     t: 'Cá sấu có 12 răng',
     b: 'Mỗi hàm, cá sấu giấu <b>4 răng độc</b> trong 12 răng. Bấm <b>Quay chọn người</b>, ai bị gọi tên có <b>5 giây</b> chọn 1 răng. Chậm tay → app chọn hộ và phạt thêm 1 ngụm.',

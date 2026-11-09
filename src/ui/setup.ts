@@ -41,14 +41,17 @@ export function renderSetup(root: HTMLElement): void {
     <header class="setup-head">
       ${crocLogo()}
       <h1 class="title">Răng Cá Sấu</h1>
-      <p class="sub">Game nhậu chuyền tay · 1 điện thoại giữa bàn</p>
+      <p class="sub"><span class="only-m">Game nhậu chuyền tay · 1 điện thoại giữa bàn</span><span class="only-d">Game nhậu cho 2–12 người · mở trên laptop hoặc chuyền tay điện thoại</span></p>
       <button class="link" data-rules>${icon('book', 18)} Luật chơi</button>
     </header>
 
-    <div class="sec-title"><span>Người chơi <b class="count"></b></span><span class="hint">Chạm avatar để đổi màu · thứ tự = chỗ ngồi</span></div>
+    <div class="setup-players">
+    <div class="sec-title"><span>Người chơi <b class="count"></b></span><span class="hint"><span class="only-m">Chạm</span><span class="only-d">Bấm</span> avatar để đổi màu · thứ tự = chỗ ngồi</span></div>
     <div class="pgrid"></div>
     <button class="btn ghost wide" data-add>${icon('plus')} Thêm người chơi</button>
+    </div>
 
+    <div class="setup-side">
     <div class="info">
       <div class="info-title">${icon('tooth', 18)} 4 răng độc mỗi hàm</div>
       <ul>
@@ -70,6 +73,7 @@ export function renderSetup(root: HTMLElement): void {
       </div>
     </div>
     <button class="link center" data-cards>${icon('cards', 18)} Thêm thẻ của hội</button>
+    </div>
 
     <div class="start-bar"><button class="btn primary big" data-start>Mở miệng cá sấu</button></div>
   </section>`;

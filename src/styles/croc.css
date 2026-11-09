@@ -1,0 +1,36 @@
+/* Cá sấu — bản vẽ sống động: viền hoạt hình, vảy, mắt vàng, lưỡi bóng, nước dãi. */
+.croc .outline { stroke: #17401F; stroke-width: 4; stroke-linejoin: round; }
+.jaw-scales { fill: #1F4F28; opacity: .55; }
+.c-gum { fill: #B83C66; }
+.c-throat { fill: #1A030B; opacity: .6; }
+.c-tongue-line { fill: none; stroke: #7D2343; stroke-width: 4; stroke-linecap: round; }
+.c-tongue-shine { fill: #fff; opacity: .2; }
+.lip-tooth { fill: #F4EBD0; stroke: #C9B98E; stroke-width: 1.4; }
+.lip-line { fill: none; stroke: #2A6B37; stroke-width: 3; opacity: .55; stroke-linecap: round; }
+.ridges path { fill: #2F7A40; stroke: #17401F; stroke-width: 3; stroke-linejoin: round; }
+.head-dots, .flap-dots { fill: #2F7A40; opacity: .75; }
+.nose-bump { fill: #4FA55F; }
+.nostril { fill: #123A1B; }
+.blush { fill: #FF7A8A; opacity: .2; }
+.drool { fill: #D8F3F7; opacity: .75; }
+.eye-white { fill: #FFFDF2; }
+.eye-iris { fill: #F2C230; }
+.eye-iris-ring { fill: none; stroke: #B9801A; stroke-width: 2.5; }
+.eye-pupil { fill: #0E1A12; }
+.eyelid { fill: #46985A; stroke: #17401F; stroke-width: 3; }
+.eye-rim { fill: none; stroke: #17401F; stroke-width: 3.5; }
+.croc.boss .eye-iris { fill: #FF5A4E; }
+.croc.boss .eye-iris-ring { stroke: #A3241B; }
+.croc.boss .eyelid { transform: translateY(4px); }
+
+/* Chuyển động "sống" */
+.breathe { transform-box: view-box; transform-origin: 180px 190px; animation: breathe 3.6s ease-in-out infinite; }
+@keyframes breathe { 50% { transform: translateY(-2px) scale(1.012, .992); } }
+.tongue { transform-box: view-box; transform-origin: 180px 370px; animation: tongue 2.8s ease-in-out infinite; }
+@keyframes tongue { 25% { transform: rotate(-2.5deg) scaleY(1.02); } 75% { transform: rotate(2.5deg); } }
+.snout { transform-box: fill-box; transform-origin: center; animation: sniff 4.2s ease-in-out infinite; }
+@keyframes sniff { 0%, 70%, 100% { transform: none; } 76% { transform: scale(1.07); } 82% { transform: none; } 88% { transform: scale(1.06); } }
+.drool { transform-box: fill-box; transform-origin: 50% 0; animation: drool 3.2s ease-in-out infinite; }
+@keyframes drool { 0%, 100% { transform: scaleY(.6); opacity: .5; } 60% { transform: scaleY(1.25); opacity: .85; } }
+.croc.closed .tongue, .croc.closed .drool { animation-play-state: paused; }
+.croc.closed .drool { visibility: hidden; }

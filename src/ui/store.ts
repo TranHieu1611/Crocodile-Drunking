@@ -5,7 +5,7 @@ import { setSound } from '../audio';
 
 const ROSTER_KEY = 'rcs.roster.v1';
 
-export type Screen = 'setup' | 'game' | 'roundEnd' | 'session' | 'cards';
+export type Screen = 'intro' | 'rules' | 'setup' | 'game' | 'roundEnd' | 'session' | 'cards';
 
 export const store = {
   g: null as GameState | null,

@@ -23,7 +23,34 @@ function stopTimer(): void {
   timer = null;
 }
 
+const TOOTH_KEYS = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0', '-', '='];
+
+/** Phím tắt cho bản desktop. */
+function onKey(e: KeyboardEvent): void {
+  const g = store.g;
+  if (!g || !croc || e.ctrlKey || e.metaKey || e.altKey) return;
+  const tag = (e.target as HTMLElement).tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (document.querySelector('#app .modal')) return;
+  if ((e.key === ' ' || e.key === 'Enter') && g.phase === 'idle' && !busy && !paused) {
+    if ((e.target as HTMLElement).closest?.('button') && e.key === 'Enter') return;
+    e.preventDefault();
+    void shufflePick();
+  } else if (e.key === 'Escape') {
+    e.preventDefault();
+    openMenu();
+  } else {
+    const i = TOOTH_KEYS.indexOf(e.key);
+    if (i >= 0 && g.phase === 'picking') {
+      e.preventDefault();
+      croc.lookAt(i);
+      void choose(i, false);
+    }
+  }
+}
+
 export function leaveGame(): void {
+  document.removeEventListener('keydown', onKey);
   stopTimer();
   stopHeartbeat();
   croc?.destroy();
@@ -36,22 +63,24 @@ export function renderGame(host: HTMLElement): void {
   const boss = isBossRound(g.round.n, g.settings);
   host.innerHTML = `
   <section class="screen game${boss ? ' boss' : ''}">
+    <div class="g-side">
     <header class="ghead">
       <div class="gh-round"><span class="lbl">Hàm</span><b>${g.round.n}</b></div>
       <div class="gh-stat"><span class="lbl">Răng độc còn</span><b class="v-poison"></b></div>
       <div class="gh-stat"><span class="lbl">Nguy cơ bị gặm</span><b class="v-danger"></b></div>
       <button class="icon-btn" data-menu aria-label="Menu">${icon('menu')}</button>
     </header>
-    ${boss ? `<div class="boss-banner"><span>HÀM TRÙM</span><small>Thẻ nặng đô đã được thả ra</small></div>` : ''}
     <div class="pbar n${Math.min(g.players.length, 12)}"></div>
     <div class="action"></div>
-    <div class="croc-host">${crocHTML()}</div>
     <p class="msg" aria-live="polite"></p>
     <div class="legend">
       <span><i class="dot drink"></i>Uống ×2</span>
       <span><i class="dot hard"></i>Cực khó ×1</span>
       <span><i class="dot buddy"></i>Uống cùng ×1</span>
     </div>
+    <p class="keys only-d"><kbd>Space</kbd> quay chọn người · <kbd>1</kbd>–<kbd>9</kbd> <kbd>0</kbd> <kbd>-</kbd> <kbd>=</kbd> chọn răng · <kbd>Esc</kbd> menu</p>
+    </div>
+    <div class="croc-host">${crocHTML()}${boss ? `<div class="boss-banner"><span>HÀM TRÙM</span><small>Thẻ nặng đô đã được thả ra</small></div>` : ''}</div>
   </section>`;
   croc = new Croc(host.querySelector('.croc') as HTMLElement);
   croc.setBoss(boss);
@@ -76,6 +105,8 @@ export function renderGame(host: HTMLElement): void {
   });
   teeth.addEventListener('pointerleave', () => croc?.lookAt(null));
   host.querySelector('[data-menu]')!.addEventListener('click', openMenu);
+  document.removeEventListener('keydown', onKey);
+  document.addEventListener('keydown', onKey);
 
   if (g.lastQuip) setMsg(esc(g.lastQuip));
   refresh();
