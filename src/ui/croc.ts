@@ -9,8 +9,8 @@ const ARC_Y = 265; // tâm cung chữ U
 const TOP_Y = 188; // điểm bắt đầu đoạn thẳng của chữ U (dưới mép hàm trên)
 const R_TEETH = 126;
 const EYES = [
-  { x: 108, y: 58 },
-  { x: 252, y: 58 },
+  { x: 60, y: 136 },
+  { x: 300, y: 136 },
 ];
 
 interface ToothPos {
@@ -58,8 +58,10 @@ const TOOTH_SVG =
   '<svg viewBox="0 0 40 44" aria-hidden="true"><path class="t-shape" d="M5 42 C5 30 12 12 18.5 3.5 Q20 1.5 21.5 3.5 C28 12 35 30 35 42 Z"/><path class="t-shine" d="M14 34 C14.5 26 17 17 19.5 11"/></svg>';
 
 // ---------- Hình vẽ ----------
+// Góc nhìn: cá sấu há miệng hướng về người chơi. Hàm trên (mõm dài, thuôn) dựng lên phía trên,
+// chóp mõm có bướu lỗ mũi, mắt híp nằm sát gốc hàm; hàm dưới hình chữ U với 12 răng.
 const LIP_Y0 = 180; // mép môi trên ở hai bên
-const LIP_SAG = 18; // độ võng của môi ở giữa
+const LIP_SAG = 16; // độ võng của môi ở giữa
 /** y của mép môi trên tại x (cung bậc hai đối xứng). */
 function lipY(x: number): number {
   const t = (346 - x) / 332;
@@ -68,28 +70,88 @@ function lipY(x: number): number {
 
 function upperTeeth(): string {
   let s = '';
-  for (let i = 0; i < 10; i++) {
-    const x = 62 + i * 26;
+  for (let i = 0; i < 11; i++) {
+    const x = 50 + i * 26;
     const y = lipY(x) - 3;
-    const h = i === 1 || i === 8 ? 24 : 16; // 2 răng nanh dài hơn
+    const h = i === 1 || i === 9 ? 26 : i === 4 || i === 6 ? 20 : 15;
     s += `<path d="M${x - 8} ${y} Q${x - 2} ${y + h * 0.7} ${x} ${y + h} Q${x + 2} ${y + h * 0.7} ${x + 8} ${y} Z" class="lip-tooth"/>`;
   }
   return s;
 }
 
-/** Vảy xếp theo cung tròn trên hàm dưới. */
+/** Răng chìa ra hai bên mõm — đặc trưng của cá sấu. */
+function sideFangs(): string {
+  const pts: Array<[number, number, number, number]> = [
+    [66, 101, -0.8, -0.6],
+    [92, 85, -0.9, -0.44],
+  ];
+  let s = '';
+  for (const [x0, y, nx0, ny] of pts) {
+    for (const side of [1, -1]) {
+      const x = side === 1 ? x0 : W - x0;
+      const nx = nx0 * side;
+      const tx = -ny; // tiếp tuyến ⟂ pháp tuyến
+      const ty = nx;
+      const b1 = `${(x + tx * 6).toFixed(1)} ${(y + ty * 6).toFixed(1)}`;
+      const b2 = `${(x - tx * 6).toFixed(1)} ${(y - ty * 6).toFixed(1)}`;
+      const tip = `${(x + nx * 13).toFixed(1)} ${(y + ny * 13).toFixed(1)}`;
+      s += `<path d="M${b1} L${tip} L${b2} Z" class="lip-tooth"/>`;
+    }
+  }
+  return s;
+}
+
+/** Vảy giáp trên mõm, xếp hàng thu hẹp dần về chóp. */
+function snoutScutes(): string {
+  let s = '';
+  const rows: Array<[number, number[]]> = [
+    [70, [22]],
+    [90, [24, 48]],
+    [110, [26, 52, 78]],
+    [132, [28, 56, 84]],
+    [154, [30, 60, 90, 118]],
+  ];
+  for (const [y, xs] of rows) {
+    for (const dx of xs) {
+      for (const side of [-1, 1]) {
+        const x = CX + side * dx;
+        s += `<rect x="${x - 8}" y="${y - 5}" width="16" height="10" rx="4.5"/>`;
+      }
+    }
+  }
+  return s;
+}
+
+/** Vảy hàm dưới xếp theo cung tròn. */
 function jawScales(): string {
   let s = '';
-  const n = 11;
+  const n = 12;
   for (let i = 0; i < n; i++) {
     const a = (Math.PI * (i + 0.5)) / n;
     const x = CX - 150 * Math.cos(a);
     const y = ARC_Y + 150 * Math.sin(a);
     const rot = (a * 180) / Math.PI - 90;
-    s += `<ellipse cx="${x.toFixed(1)}" cy="${y.toFixed(1)}" rx="13" ry="7" transform="rotate(${rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
+    s += `<rect x="${(x - 10).toFixed(1)}" y="${(y - 6).toFixed(1)}" width="20" height="12" rx="5" transform="rotate(${rot.toFixed(1)} ${x.toFixed(1)} ${y.toFixed(1)})"/>`;
   }
-  for (const y of [190, 222]) {
-    s += `<ellipse cx="30" cy="${y}" rx="7" ry="12"/><ellipse cx="330" cy="${y}" rx="7" ry="12"/>`;
+  for (const y of [188, 216, 244]) s += `<rect x="22" y="${y - 9}" width="14" height="18" rx="5"/><rect x="324" y="${y - 9}" width="14" height="18" rx="5"/>`;
+  return s;
+}
+
+/** Răng đan cài quanh mép hàm khi ngậm miệng. */
+function flapTeeth(): string {
+  let s = '';
+  const n = 14;
+  for (let i = 0; i <= n; i++) {
+    const a = (Math.PI * i) / n;
+    const r = 164;
+    const x = CX - r * Math.cos(a);
+    const y = ARC_Y + r * Math.sin(a);
+    const nx = -Math.cos(a);
+    const ny = Math.sin(a);
+    const tx = -ny;
+    const ty = nx;
+    const L = i % 2 ? 14 : 10;
+    s += `<path d="M${(x + tx * 6).toFixed(1)} ${(y + ty * 6).toFixed(1)} L${(x + nx * L).toFixed(1)} ${(y + ny * L).toFixed(1)} L${(x - tx * 6).toFixed(1)} ${(y - ty * 6).toFixed(1)} Z" class="lip-tooth"/>`;
   }
   return s;
 }
@@ -107,87 +169,101 @@ export function crocHTML(): string {
     .join('');
 
   const lipPath = `Q180 ${LIP_Y0 + LIP_SAG * 2} 14 ${LIP_Y0}`;
-  const headPath = `M14 ${LIP_Y0} C8 138 26 96 66 84 C92 77 116 88 140 82 C162 74 198 74 220 82 C244 88 268 77 294 84 C334 96 352 138 346 ${LIP_Y0} ${lipPath} Z`;
+  // Mõm dài thuôn dần lên chóp, hai bên lượn sóng như cá sấu thật.
+  const headPath =
+    `M14 ${LIP_Y0} C8 150 26 116 50 108 C70 98 92 92 104 70 Q110 54 118 46 C128 32 146 14 180 12 ` +
+    `C214 14 232 32 242 46 Q250 54 256 70 C268 92 290 98 310 108 C334 116 352 150 346 ${LIP_Y0} ${lipPath} Z`;
 
-  const bump = (e: { x: number; y: number }) =>
-    `<circle cx="${e.x}" cy="${e.y + 6}" r="41" fill="url(#${id}-up)" class="outline"/>`;
-  const eye = (e: { x: number; y: number }, i: number) => `
+  const eye = (e: { x: number; y: number }, i: number) => {
+    const tilt = i === 0 ? 12 : -12;
+    return `
+    <g class="eye-socket">
+      <ellipse cx="${e.x}" cy="${e.y}" rx="31" ry="25" fill="url(#${id}-up)" class="outline"/>
+      <g class="brow-bumps"><ellipse cx="${e.x - 16}" cy="${e.y - 19}" rx="8" ry="6"/><ellipse cx="${e.x}" cy="${e.y - 23}" rx="9" ry="6.5"/><ellipse cx="${e.x + 16}" cy="${e.y - 19}" rx="8" ry="6"/></g>
+    </g>
     <g class="eye" style="transform-origin:${e.x}px ${e.y}px">
-      <clipPath id="${id}-eye${i}"><ellipse cx="${e.x}" cy="${e.y}" rx="22" ry="24"/></clipPath>
-      <ellipse cx="${e.x}" cy="${e.y}" rx="22" ry="24" class="eye-white"/>
-      <g clip-path="url(#${id}-eye${i})">
-        <g class="pupil" data-eye="${i}">
-          <circle cx="${e.x}" cy="${e.y + 2}" r="15.5" class="eye-iris"/>
-          <circle cx="${e.x}" cy="${e.y + 2}" r="15.5" class="eye-iris-ring"/>
-          <ellipse cx="${e.x}" cy="${e.y + 2}" rx="3.8" ry="13" class="eye-pupil"/>
-          <circle cx="${e.x + 5}" cy="${e.y - 5}" r="3.6" fill="#fff"/>
-          <circle cx="${e.x - 5}" cy="${e.y + 9}" r="1.6" fill="#fff" opacity=".8"/>
+      <g transform="rotate(${tilt} ${e.x} ${e.y})">
+        <clipPath id="${id}-eye${i}"><ellipse cx="${e.x}" cy="${e.y}" rx="17" ry="12"/></clipPath>
+        <ellipse cx="${e.x}" cy="${e.y}" rx="17" ry="12" class="eye-white"/>
+        <g clip-path="url(#${id}-eye${i})">
+          <g class="pupil" data-eye="${i}">
+            <circle cx="${e.x}" cy="${e.y + 1}" r="10.5" class="eye-iris"/>
+            <circle cx="${e.x}" cy="${e.y + 1}" r="10.5" class="eye-iris-ring"/>
+            <ellipse cx="${e.x}" cy="${e.y + 1}" rx="2.4" ry="10" class="eye-pupil"/>
+            <circle cx="${e.x + 4}" cy="${e.y - 3}" r="2.4" fill="#fff"/>
+          </g>
+          <path d="M${e.x - 19} ${e.y - 14} L${e.x + 19} ${e.y - 14} L${e.x + 19} ${e.y - 3} Q${e.x} ${e.y + 1} ${e.x - 19} ${e.y - 5} Z" class="eyelid"/>
         </g>
-        <path d="M${e.x - 24} ${e.y - 26} L${e.x + 24} ${e.y - 26} L${e.x + 24} ${e.y - 15} Q${e.x} ${e.y - 9} ${e.x - 24} ${e.y - 15} Z" class="eyelid"/>
+        <ellipse cx="${e.x}" cy="${e.y}" rx="17" ry="12" class="eye-rim"/>
       </g>
-      <ellipse cx="${e.x}" cy="${e.y}" rx="22" ry="24" class="eye-rim"/>
     </g>`;
+  };
 
   return `
   <div class="croc" role="group" aria-label="Hàm cá sấu">
     <svg class="croc-svg" viewBox="0 0 ${W} ${H}" aria-hidden="true">
       <defs>
         <linearGradient id="${id}-low" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#3C8E4C"/><stop offset="1" stop-color="#1F5129"/>
+          <stop offset="0" stop-color="#55874A"/><stop offset="1" stop-color="#284A27"/>
         </linearGradient>
-        <radialGradient id="${id}-mouth" cx=".5" cy=".55" r=".6">
+        <radialGradient id="${id}-mouth" cx=".5" cy=".5" r=".62">
           <stop offset="0" stop-color="#2A0512"/><stop offset=".55" stop-color="#4A0E26"/><stop offset="1" stop-color="#6E1A3A"/>
         </radialGradient>
         <radialGradient id="${id}-tongue" cx=".45" cy=".35" r=".7">
-          <stop offset="0" stop-color="#D2557D"/><stop offset="1" stop-color="#8E2A4C"/>
+          <stop offset="0" stop-color="#CC5079"/><stop offset="1" stop-color="#8A284A"/>
         </radialGradient>
       </defs>
-      <path class="c-low outline" fill="url(#${id}-low)" d="M13 170 L13 ${ARC_Y} A167 167 0 0 0 347 ${ARC_Y} L347 170 Z"/>
+      <path class="outline" fill="url(#${id}-low)" d="M13 170 L13 ${ARC_Y} A167 167 0 0 0 347 ${ARC_Y} L347 170 Z"/>
       <g class="jaw-scales">${jawScales()}</g>
       <path class="c-gum" d="M48 170 L48 ${ARC_Y} A132 132 0 0 0 312 ${ARC_Y} L312 170 Z"/>
       <path class="c-mouth" fill="url(#${id}-mouth)" d="M56 170 L56 ${ARC_Y} A124 124 0 0 0 304 ${ARC_Y} L304 170 Z"/>
-      <ellipse cx="180" cy="215" rx="62" ry="22" class="c-throat"/>
+      <ellipse cx="180" cy="212" rx="70" ry="20" class="c-throat"/>
       <g class="tongue">
-        <path class="c-tongue" fill="url(#${id}-tongue)" d="M180 226 C238 224 254 292 238 342 C226 380 134 380 122 342 C106 292 122 228 180 226 Z"/>
-        <path class="c-tongue-line" d="M180 252 C176 280 184 306 180 334"/>
-        <ellipse cx="156" cy="262" rx="12" ry="22" class="c-tongue-shine" transform="rotate(14 156 262)"/>
+        <path class="c-tongue" fill="url(#${id}-tongue)" d="M180 232 C232 230 246 292 234 340 C224 378 136 378 126 340 C114 292 128 234 180 232 Z"/>
+        <path class="c-tongue-line" d="M180 256 C176 282 184 308 180 334"/>
+        <ellipse cx="158" cy="266" rx="10" ry="20" class="c-tongue-shine" transform="rotate(14 158 266)"/>
       </g>
     </svg>
     <div class="teeth">${teeth}</div>
     <svg class="croc-flap" viewBox="0 0 ${W} ${H}" aria-hidden="true">
       <defs>
         <linearGradient id="${id}-flap" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#4FA45F"/><stop offset="1" stop-color="#2E7A3F"/>
+          <stop offset="0" stop-color="#5E9050"/><stop offset="1" stop-color="#335C2D"/>
         </linearGradient>
       </defs>
-      <path class="outline" fill="url(#${id}-flap)" d="M13 160 L13 ${ARC_Y} A167 167 0 0 0 347 ${ARC_Y} L347 160 Z"/>
-      <path class="c-up-shade" d="M40 ${ARC_Y + 10} A140 140 0 0 0 320 ${ARC_Y + 10}"/>
-      <g class="flap-dots"><ellipse cx="120" cy="250" rx="12" ry="8"/><ellipse cx="180" cy="236" rx="13" ry="9"/><ellipse cx="240" cy="250" rx="12" ry="8"/><ellipse cx="150" cy="300" rx="10" ry="7"/><ellipse cx="210" cy="300" rx="10" ry="7"/><ellipse cx="180" cy="350" rx="11" ry="7"/></g>
+      ${flapTeeth()}
+      <path class="outline" fill="url(#${id}-flap)" d="M13 160 L13 ${ARC_Y} A162 162 0 0 0 347 ${ARC_Y} L347 160 Z"/>
+      <g class="scutes">${[200, 236, 272, 308, 344]
+        .map((y, r) =>
+          [-1, 1]
+            .flatMap((sd) => [22, 56, 90].slice(0, 3 - Math.floor(r / 2)).map((dx) => `<rect x="${CX + sd * dx - 9}" y="${y - 6}" width="18" height="12" rx="5"/>`))
+            .join(''),
+        )
+        .join('')}</g>
+      <path class="c-up-shade" d="M180 190 L180 380"/>
     </svg>
     <svg class="croc-head" viewBox="0 0 ${W} ${H}" aria-hidden="true">
       <defs>
         <linearGradient id="${id}-up" x1="0" y1="0" x2="0" y2="1">
-          <stop offset="0" stop-color="#5DBA6B"/><stop offset=".55" stop-color="#3F8F4F"/><stop offset="1" stop-color="#2F7A40"/>
+          <stop offset="0" stop-color="#7DAA55"/><stop offset=".5" stop-color="#4E8243"/><stop offset="1" stop-color="#355F2C"/>
         </linearGradient>
       </defs>
       <g class="breathe">
         ${upperTeeth()}
-        <path class="drool" d="M118 ${lipY(118) - 2} q-3 14 0 26 q4 6 7 0 q2 -12 -1 -26 Z"/>
-        ${EYES.map(bump).join('')}
+        ${sideFangs()}
+        <path class="drool" d="M124 ${lipY(124) - 2} q-3 14 0 26 q4 6 7 0 q2 -12 -1 -26 Z"/>
         <path d="${headPath}" fill="url(#${id}-up)" class="outline"/>
-        <path d="M44 156 Q180 ${LIP_Y0 + LIP_SAG * 2 - 10} 316 156" class="c-up-shade"/>
-        <g class="ridges"><path d="M150 84 l8 -12 l8 12 Z"/><path d="M172 80 l8 -14 l8 14 Z"/><path d="M194 84 l8 -12 l8 12 Z"/></g>
-        <g class="head-dots"><ellipse cx="72" cy="122" rx="9" ry="6"/><ellipse cx="288" cy="122" rx="9" ry="6"/><ellipse cx="96" cy="146" rx="6" ry="4"/><ellipse cx="264" cy="146" rx="6" ry="4"/><ellipse cx="120" cy="112" rx="5" ry="3.5"/><ellipse cx="240" cy="112" rx="5" ry="3.5"/></g>
-        <ellipse cx="62" cy="152" rx="18" ry="9" class="blush"/><ellipse cx="298" cy="152" rx="18" ry="9" class="blush"/>
+        <g class="scutes">${snoutScutes()}</g>
+        <path d="M180 52 L180 168" class="snout-groove"/>
+        <path d="M40 160 Q180 ${LIP_Y0 + LIP_SAG * 2 - 14} 320 160" class="c-up-shade"/>
         <g class="snout">
-          <ellipse cx="158" cy="118" rx="16" ry="12" class="nose-bump"/>
-          <ellipse cx="202" cy="118" rx="16" ry="12" class="nose-bump"/>
-          <ellipse cx="160" cy="119" rx="6.5" ry="4.5" class="nostril" transform="rotate(-20 160 119)"/>
-          <ellipse cx="200" cy="119" rx="6.5" ry="4.5" class="nostril" transform="rotate(20 200 119)"/>
+          <ellipse cx="180" cy="32" rx="30" ry="17" class="nose-bump outline-thin"/>
+          <ellipse cx="168" cy="32" rx="5.5" ry="7" class="nostril" transform="rotate(-25 168 32)"/>
+          <ellipse cx="192" cy="32" rx="5.5" ry="7" class="nostril" transform="rotate(25 192 32)"/>
         </g>
-        <path d="M60 ${LIP_Y0 - 4} Q180 ${LIP_Y0 + LIP_SAG * 2 + 2} 300 ${LIP_Y0 - 4}" class="lip-line"/>
+        <path d="M54 ${LIP_Y0 - 3} Q180 ${LIP_Y0 + LIP_SAG * 2 + 1} 306 ${LIP_Y0 - 3}" class="lip-line"/>
         <g class="scar">
-          <path d="M222 92 L292 150"/><path d="M236 104 L250 92"/><path d="M252 117 L266 105"/><path d="M268 130 L282 118"/>
+          <path d="M210 70 L262 140"/><path d="M222 84 L236 74"/><path d="M234 101 L248 91"/><path d="M246 118 L260 108"/>
         </g>
         ${EYES.map(eye).join('')}
       </g>
@@ -233,7 +309,7 @@ export class Croc {
       const dx = t.x - e.x;
       const dy = t.y - e.y;
       const d = Math.hypot(dx, dy) || 1;
-      p.style.transform = `translate(${((dx / d) * 9).toFixed(1)}px, ${((dy / d) * 6).toFixed(1)}px)`;
+      p.style.transform = `translate(${((dx / d) * 5).toFixed(1)}px, ${((dy / d) * 3).toFixed(1)}px)`;
     });
   }
 

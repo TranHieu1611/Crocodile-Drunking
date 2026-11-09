@@ -17,23 +17,11 @@ export function leaveIntro(): void {
   introCroc = null;
 }
 
-function fireflies(n = 14): string {
-  let s = '';
-  for (let i = 0; i < n; i++) {
-    const x = Math.round(Math.random() * 100);
-    const y = Math.round(20 + Math.random() * 75);
-    const d = (4 + Math.random() * 6).toFixed(1);
-    const dl = (-Math.random() * 8).toFixed(1);
-    s += `<i style="left:${x}%;top:${y}%;animation-duration:${d}s;animation-delay:${dl}s"></i>`;
-  }
-  return `<div class="fireflies" aria-hidden="true">${s}</div>`;
-}
 
 export function renderIntro(root: HTMLElement): void {
   const saved = loadGame();
   root.innerHTML = `
   <section class="screen intro">
-    ${fireflies()}
     <div class="intro-copy">
       <p class="intro-kicker">Game nhậu · 2–12 người</p>
       <h1 class="intro-title"><span>Răng</span><span>Cá Sấu</span></h1>

@@ -2,12 +2,14 @@ import './styles/fonts.css';
 import './styles/app.css';
 import './styles/layout.css';
 import './styles/croc.css';
+import './styles/swamp.css';
 import { store, setNav, loadRoster, type Screen } from './ui/store';
 import { renderIntro, renderRulesPage, leaveIntro } from './ui/intro';
 import { renderSetup } from './ui/setup';
 import { renderGame, leaveGame } from './ui/game';
 import { renderRoundEnd, renderSession } from './ui/summary';
 import { renderCards } from './ui/cardsEditor';
+import { swampHTML } from './ui/swamp';
 
 declare const __SINGLE__: boolean;
 
@@ -36,6 +38,7 @@ function go(s: Screen): void {
   window.scrollTo(0, 0);
 }
 
+app.insertAdjacentHTML('afterbegin', swampHTML());
 setNav(go);
 loadRoster();
 go('intro');

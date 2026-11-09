@@ -1,0 +1,123 @@
+/* ===== Hình nền đầm lầy ===== */
+.view { z-index: 1; }
+.swamp { position: absolute; inset: 0; z-index: 0; overflow: hidden; pointer-events: none; }
+.swamp * { pointer-events: none; }
+
+.sw-moon {
+  position: absolute; top: 6%; right: 10%;
+  width: 58px; height: 58px; border-radius: 50%;
+  background: #E6F0C8; opacity: .16;
+  box-shadow: 0 0 40px 14px rgba(230, 240, 200, .18);
+}
+.sw-trees { position: absolute; left: 0; right: 0; bottom: 21%; width: 100%; height: 13%; fill: #08120B; opacity: .9; }
+
+.sw-fog {
+  position: absolute; left: -40%; width: 180%; height: 18%;
+  border-radius: 50%;
+  background: rgba(170, 200, 170, .07);
+  filter: blur(26px);
+  will-change: transform;
+}
+.sw-fog.f1 { bottom: 24%; animation: fog 46s ease-in-out infinite alternate; }
+.sw-fog.f2 { bottom: 4%; height: 14%; background: rgba(170, 200, 170, .06); animation: fog 34s ease-in-out infinite alternate-reverse; }
+@keyframes fog { from { transform: translateX(-12%); } to { transform: translateX(12%); } }
+
+.sw-water { position: absolute; left: 0; right: 0; bottom: 0; height: 22%; background: #091510; }
+.sw-wave { position: absolute; left: 0; top: -9px; width: 200%; height: 12px; fill: #091510; animation: wave 14s linear infinite; }
+@keyframes wave { to { transform: translateX(-50%); } }
+.sw-glint {
+  position: absolute; top: 8%; right: 9%; width: 70px; height: 70%;
+  background: repeating-linear-gradient(180deg, rgba(230, 240, 200, .12) 0 2px, transparent 2px 11px);
+  opacity: .7; animation: glint 4s ease-in-out infinite;
+  mask-image: linear-gradient(180deg, #000, transparent);
+  -webkit-mask-image: linear-gradient(180deg, #000, transparent);
+}
+@keyframes glint { 50% { opacity: .35; transform: scaleX(.8); } }
+
+.sw-ripple {
+  position: absolute; width: 90px; height: 18px; margin: -9px 0 0 -45px;
+  border: 1.5px solid rgba(200, 235, 200, .16); border-radius: 50%;
+  animation: ripple 6s ease-out infinite;
+}
+@keyframes ripple { from { transform: scale(.2); opacity: 1; } to { transform: scale(1.6); opacity: 0; } }
+
+.sw-bubble {
+  position: absolute; bottom: 12%; width: 6px; height: 6px; border-radius: 50%;
+  border: 1.2px solid rgba(210, 245, 210, .35);
+  animation: bubble-up 7s ease-in infinite;
+}
+@keyframes bubble-up {
+  0% { transform: translateY(0) scale(.6); opacity: 0; }
+  20% { opacity: 1; }
+  85% { opacity: .8; }
+  100% { transform: translateY(-46px) scale(1.2); opacity: 0; }
+}
+
+.sw-pad { position: absolute; height: auto; animation: bob 7s ease-in-out infinite; }
+.sw-pad .pad { fill: #183420; }
+.sw-pad .vein { stroke: #234A2C; stroke-width: 2; fill: none; }
+.sw-pad .lotus path { fill: #E58FB0; opacity: .75; }
+.sw-pad .lotus .l2 { fill: #F2B6CC; }
+@keyframes bob { 50% { transform: translateY(-3px) rotate(-3deg); } }
+
+.sw-eyes { position: absolute; top: 18%; left: -20%; width: 96px; animation: lurk 38s linear infinite; opacity: 0; }
+.sw-eyes .snout { fill: #0D2213; }
+.sw-eyes .bump { fill: #12301A; }
+.sw-eyes .glow { fill: #E8D24A; filter: drop-shadow(0 0 4px rgba(232, 210, 74, .9)); animation: eyeblink 5s infinite; transform-box: fill-box; transform-origin: center; }
+.sw-eyes .slit { fill: #0E1A12; animation: eyeblink 5s infinite; transform-box: fill-box; transform-origin: center; }
+@keyframes lurk {
+  0% { left: -20%; opacity: 0; }
+  8% { opacity: .9; }
+  45% { opacity: .9; }
+  55% { left: 60%; opacity: 0; }
+  100% { left: 60%; opacity: 0; }
+}
+@keyframes eyeblink { 0%, 92%, 100% { transform: scaleY(1); } 95% { transform: scaleY(.1); } }
+
+.sw-reeds { position: absolute; bottom: 0; width: 34%; max-width: 260px; height: 46%; }
+.sw-reeds svg { width: 100%; height: 100%; overflow: visible; }
+.sw-reeds.left { left: -4%; }
+.sw-reeds.right { right: -4%; transform: scaleX(-1); }
+.sw-reeds .stem { fill: none; stroke: #12271A; stroke-width: 4; stroke-linecap: round; }
+.sw-reeds .stem.thin { stroke-width: 2; }
+.sw-reeds .cattail { fill: #2B2416; }
+.sw-reeds .blade { fill: #10231A; }
+.sw-sway { transform-box: view-box; transform-origin: 50% 100%; animation: sway 6s ease-in-out infinite; }
+.sw-sway.s2 { animation-duration: 7.5s; animation-delay: -2s; }
+.sw-sway.s3 { animation-duration: 5.2s; animation-delay: -4s; }
+@keyframes sway { 50% { transform: rotate(2.4deg); } }
+
+.sw-flies i {
+  position: absolute; width: 4px; height: 4px; border-radius: 50%;
+  background: var(--lime); box-shadow: 0 0 10px 2px rgba(184, 255, 60, .65);
+  animation: fly 6s ease-in-out infinite;
+}
+@keyframes fly {
+  0%, 100% { transform: translate(0, 0); opacity: .05; }
+  40% { opacity: .85; }
+  50% { transform: translate(16px, -24px); opacity: .55; }
+  80% { opacity: .1; }
+}
+
+/* Lớp nội dung trong suốt để thấy đầm lầy */
+.game.boss { background: rgba(70, 8, 8, .55); }
+.start-bar { background: rgba(14, 26, 18, .82) !important; backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+
+@media (min-width: 900px) {
+  .sw-moon { width: 96px; height: 96px; top: 7%; right: 8%; }
+  .sw-water { height: 20%; }
+  .sw-trees { bottom: 19%; height: 16%; }
+  .sw-reeds { width: 22%; max-width: 340px; height: 52%; }
+  .sw-eyes { width: 130px; }
+  .setup .start-bar { background: transparent !important; backdrop-filter: none; }
+  .g-side { background: rgba(22, 38, 27, .88); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); }
+  .game.boss .g-side { background: rgba(58, 17, 17, .9); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .swamp *, .swamp *::before { animation: none !important; }
+  .sw-eyes { opacity: .8; left: 12%; }
+}
+@media (max-width: 899px) {
+  #app:not([data-screen="intro"]) .sw-moon { display: none; }
+}
