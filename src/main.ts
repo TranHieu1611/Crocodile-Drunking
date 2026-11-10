@@ -6,6 +6,7 @@ import './styles/swamp.css';
 import './styles/wheel.css';
 import './styles/exercise.css';
 import './styles/players.css';
+import './styles/align.css';
 import { store, setNav, loadRoster, type Screen } from './ui/store';
 import { renderIntro, renderRulesPage, leaveIntro } from './ui/intro';
 import { renderSetup } from './ui/setup';

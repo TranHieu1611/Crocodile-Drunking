@@ -64,10 +64,10 @@ export function renderSetup(root: HTMLElement): void {
     <div class="setup-players">
     <div class="sec-title"><span>Người chơi <b class="count"></b></span><span class="hint">Thứ tự = chỗ ngồi quanh bàn</span></div>
     <div class="phelp">
-      <span>${icon('refresh', 14)} <b>Bấm avatar</b> để chọn con vật &amp; màu</span>
-      <span>${icon('left', 14)}${icon('right', 14)} <b>Dời chỗ</b> để xếp đúng chỗ ngồi (ảnh hưởng thẻ “người bên trái/phải” và chế độ Vòng tròn)</span>
-      <span><i class="tg-mini"></i> <b>OK cặp</b>: đồng ý nhận thử thách đụng chạm (ôm, ngồi đùi, nhảy slow…)</span>
-      <span>${icon('water', 14)} <b>Nước lọc</b>: ai lái xe thì uống nước lọc thay rượu bia</span>
+      <div class="ph-row"><i class="ph-ic">${icon('refresh', 14)}</i><p><b>Bấm avatar</b> để chọn con vật &amp; màu</p></div>
+      <div class="ph-row"><i class="ph-ic">${icon('left', 14)}${icon('right', 14)}</i><p><b>Dời chỗ</b> để xếp đúng chỗ ngồi (ảnh hưởng thẻ “người bên trái/phải” và chế độ Vòng tròn)</p></div>
+      <div class="ph-row"><i class="ph-ic"><i class="tg-mini"></i></i><p><b>OK cặp</b>: đồng ý nhận thử thách đụng chạm (ôm, ngồi đùi, nhảy slow…)</p></div>
+      <div class="ph-row"><i class="ph-ic">${icon('water', 14)}</i><p><b>Nước lọc</b>: ai lái xe thì uống nước lọc thay rượu bia</p></div>
     </div>
     <div class="pgrid"></div>
     <button class="btn ghost wide" data-add>${icon('plus')} Thêm người chơi</button>
