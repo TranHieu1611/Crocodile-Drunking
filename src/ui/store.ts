@@ -28,7 +28,7 @@ export function persist(): void {
 }
 
 export function cardData(): CardData {
-  return mergedCards(loadCustomCards());
+  return mergedCards(loadCustomCards(), store.g?.settings.deckSet ?? store.settings.deckSet ?? 'easy');
 }
 
 let uid = 0;

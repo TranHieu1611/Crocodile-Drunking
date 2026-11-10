@@ -1,0 +1,62 @@
+{
+  "_meta": {
+    "version": 1,
+    "name": "Dễ thở",
+    "note": "Bộ thẻ nhẹ nhàng để chơi thử: ~80% thử thách làm được ngay, ít đụng chạm, gần như không đụng tới người ngoài/điện thoại. Placeholder và tag giống bộ chính."
+  },
+  "hard": [
+    { "id": "e-h01", "text": "{A} nói 3 điều mình thích nhất ở người ngồi bên trái là {L}, nhìn thẳng mắt, không được cười.", "tags": [], "seconds": 30 },
+    { "id": "e-h02", "text": "{A} hát điệp khúc một bài nhạc thiếu nhi bằng giọng opera.", "tags": [], "seconds": 30 },
+    { "id": "e-h03", "text": "{A} bắt chước giọng và điệu bộ của {R} trong 20 giây, cả bàn đoán đúng là ai mới qua.", "tags": [], "seconds": 25 },
+    { "id": "e-h04", "text": "{A} kể một kỷ niệm xấu hổ thời đi học. Cả bàn gật đầu là qua.", "tags": [], "seconds": 45 },
+    { "id": "e-h05", "text": "{A} nói 5 từ bắt đầu bằng chữ 'B' trong 10 giây, không được lặp, không được ấp úng.", "tags": [], "seconds": 10 },
+    { "id": "e-h06", "text": "{A} đứng lên nhảy một điệu TikTok bất kỳ trong 15 giây.", "tags": [], "seconds": 20 },
+    { "id": "e-h07", "text": "{A} làm MC giới thiệu {L} như ngôi sao lên sân khấu, có tiếng vỗ tay của cả bàn.", "tags": [], "seconds": 30 },
+    { "id": "e-h08", "text": "{A} nói 'Tôi yêu cá sấu' bằng 3 giọng khác nhau: em bé, ông cụ, phát thanh viên.", "tags": [], "seconds": 20 },
+    { "id": "e-h09", "text": "{A} chơi oẳn tù tì 3 ván với {R}. Thắng ít nhất 2 ván mới qua.", "tags": [], "seconds": 20 },
+    { "id": "e-h10", "text": "{A} diễn câm một bộ phim nổi tiếng, cả bàn đoán đúng trong 30 giây.", "tags": [], "seconds": 30 },
+    { "id": "e-h11", "text": "{A} khen mỗi người trong bàn một câu thật lòng, không trùng ý nhau.", "tags": [], "seconds": 60 },
+    { "id": "e-h12", "text": "{A} nói thật: lần gần nhất mình khóc là vì chuyện gì?", "tags": [], "seconds": 30 },
+    { "id": "e-h13", "text": "{A} đứng một chân, tay chạm mũi, đọc bảng chữ cái từ A đến M không vấp.", "tags": [], "seconds": 25 },
+    { "id": "e-h14", "text": "{A} kể một câu chuyện cười. Ít nhất 3 người cười mới qua.", "tags": [], "seconds": 40 },
+    { "id": "e-h15", "text": "{A} cho cả bàn xem ảnh màn hình khoá điện thoại và kể lý do chọn ảnh đó.", "tags": ["phone"], "seconds": 20 },
+    { "id": "e-h16", "text": "{A} chọn một người trong bàn và tặng họ một biệt danh dễ thương dùng tới hết buổi.", "tags": [], "seconds": 20 },
+    { "id": "e-h17", "text": "{A} nắm tay {R} và nói 'Cảm ơn vì đã có mặt hôm nay' thật tình cảm.", "tags": ["couple"], "seconds": 15 },
+    { "id": "e-h18", "text": "{A} kể tên 5 bài hát của Sơn Tùng trong 15 giây.", "tags": [], "seconds": 15 },
+    { "id": "e-h19", "text": "{A} làm 3 biểu cảm: vui, giận, sốc. Cả bàn chấm, đủ 'drama' mới qua.", "tags": [], "seconds": 20 },
+    { "id": "e-h20", "text": "{A} giữ nguyên tư thế 'tượng' 20 giây trong khi cả bàn được chọc cười (không chạm vào người).", "tags": [], "seconds": 25 },
+    { "id": "e-h21", "text": "HÀM TRÙM: {A} trả lời thật 2 câu hỏi do 2 người trong bàn đặt ra (không quá riêng tư).", "tags": [], "seconds": 60, "boss": true },
+    { "id": "e-h22", "text": "HÀM TRÙM: {A} hát trọn một điệp khúc bài tình ca, cả bàn hát bè theo.", "tags": [], "seconds": 45, "boss": true },
+    { "id": "e-h23", "text": "HÀM TRÙM: {A} và {L} đấu vật tay. Thua thì uống, thắng thì qua.", "tags": [], "seconds": 30, "boss": true }
+  ],
+  "buddy": [
+    { "id": "e-b01", "text": "{B} và {A} chơi 'ai chớp mắt trước' — nhìn nhau 20 giây.", "tags": [], "seconds": 20 },
+    { "id": "e-b02", "text": "{B} kể 2 điều tốt về {A} mà cả bàn chưa biết.", "tags": [], "seconds": 30 },
+    { "id": "e-b03", "text": "{B} và {A} cùng hát một đoạn nhạc do cả bàn chọn.", "tags": [], "seconds": 30 },
+    { "id": "e-b04", "text": "{B} bắt chước {A} lúc mới quen nhau. {A} chấm điểm.", "tags": [], "seconds": 20 },
+    { "id": "e-b05", "text": "{B} và {A} oẳn tù tì 1 ván, ai thua làm 5 cái squat.", "tags": [], "seconds": 20 },
+    { "id": "e-b06", "text": "{B} nói một câu tỏ tình kiểu ngôn tình với {A}, giọng phải nghiêm túc.", "tags": [], "seconds": 20 },
+    { "id": "e-b07", "text": "{B} và {A} đập tay theo một nhịp do cả bàn đặt, sai nhịp là thua.", "tags": [], "seconds": 20 },
+    { "id": "e-b08", "text": "{B} chụp một tấm ảnh 'tạo dáng bá đạo' cho {A}, cả bàn chấm.", "tags": [], "seconds": 30 },
+    { "id": "e-b09", "text": "{B} và {A} cùng kể tên các món ăn bắt đầu bằng chữ 'C', xen kẽ, ai bí trước thua.", "tags": [], "seconds": 30 },
+    { "id": "e-b10", "text": "{B} đút {A} một miếng mồi kèm câu 'Ăn đi cho mau lớn'.", "tags": ["couple"], "seconds": 15 },
+    { "id": "e-b11", "text": "{B} và {A} đổi chỗ ngồi đến hết hàm.", "tags": [], "seconds": 10 },
+    { "id": "e-b12", "text": "{B} đoán món ăn yêu thích của {A}. Sai thì cả 2 cùng uống 1 ngụm.", "tags": [], "seconds": 15 },
+    { "id": "e-b13", "text": "{B} và {A} diễn lại cảnh gọi món ở quán nhậu bằng tiếng Anh.", "tags": [], "seconds": 30 },
+    { "id": "e-b14", "text": "{B} ôm {A} một cái thật chặt 3 giây kèm 'Cố lên!'.", "tags": ["couple"], "seconds": 10 },
+    { "id": "e-b15", "text": "{B} và {A} cùng nói 'Một, hai, ba, dzô!' bằng giọng của 2 nhân vật hoạt hình.", "tags": [], "seconds": 15 },
+    { "id": "e-b16", "text": "{B} kể tên 3 bài hát hợp với {A}, giải thích lý do.", "tags": [], "seconds": 30 },
+    { "id": "e-b17", "text": "{B} và {A} so ai giữ plank lâu hơn (tối đa 20 giây).", "tags": [], "seconds": 25 },
+    { "id": "e-b18", "text": "HÀM TRÙM: {B} và {A} nhảy một điệu cha-cha-cha 15 giây, cả bàn vỗ nhịp.", "tags": [], "seconds": 20, "boss": true },
+    { "id": "e-b19", "text": "HÀM TRÙM: {B} và {A} cùng hát 'Chúc mừng sinh nhật' cho người được cả bàn chọn, có vũ đạo.", "tags": [], "seconds": 30, "boss": true }
+  ],
+  "safe_quips": [
+    "Thoát nạn trong gang tấc!",
+    "Cá sấu hôm nay ăn chay.",
+    "Răng này mềm như bánh flan.",
+    "Sống thêm được một lượt, đừng mừng sớm.",
+    "Cá sấu đang để dành bạn cho món chính.",
+    "Hú hồn, suýt nữa thì toang."
+  ],
+  "bet_reminder": "Cược nhanh: ai đoán {A} sẽ bị gặm thì bấm tên mình!"
+}

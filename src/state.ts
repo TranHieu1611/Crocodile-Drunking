@@ -22,9 +22,11 @@ export interface Settings {
   sound: boolean;
   /** Cách chọn người: ngẫu nhiên / ngẫu nhiên không lặp tới khi đủ lượt / lần lượt theo chỗ ngồi. */
   pickMode?: PickMode;
+  /** Bộ thẻ: 'easy' (Dễ thở) hoặc 'main' (Chính). */
+  deckSet?: 'easy' | 'main';
 }
 
-export type Reason = 'drink' | 'godsave' | 'hardDone' | 'hardFail' | 'buddyA' | 'buddyB' | 'buddyFree' | 'slow' | 'partySelf' | 'partyAll' | 'pushup' | 'squat' | 'exerciseFail';
+export type Reason = 'drink' | 'godsave' | 'hardDone' | 'hardFail' | 'buddyA' | 'buddyB' | 'buddyFree' | 'slow' | 'partySelf' | 'partyAll' | 'pushup' | 'squat' | 'exerciseFail' | 'betLose' | 'betExtra' | 'betFree';
 
 export interface LogEntry {
   playerId: string;
@@ -50,6 +52,7 @@ export type Pending =
   | { kind: 'drink'; a: string; result?: 'save' | 'drink' }
   | { kind: 'wheel'; a: string; result?: 'self' | 'all' }
   | { kind: 'exercise'; ex: ExerciseKind; a: string; value?: number; angle?: number }
+  | { kind: 'bet'; a: string; winners: string[]; result?: 'drink' | 'free'; angle?: number }
   | { kind: 'hard'; a: string; cardId: string; text: string; seconds: number; coupleHint: boolean; boss: boolean }
   | { kind: 'buddy'; a: string; b: string; cardId: string; text: string; seconds: number; boss: boolean };
 
@@ -75,6 +78,10 @@ export interface GameState {
   lastQuip: string | null;
   /** Chế độ 'bag': những người đã chơi trong lượt xoay hiện tại. */
   picked?: string[];
+  /** Cược nhanh: những người đang cược "bị gặm" ở lượt hiện tại. */
+  bets?: string[];
+  /** Người cược thắng chờ quay vòng Cược thắng sau khi xử lý răng độc. */
+  betWinners?: string[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -86,6 +93,7 @@ export const DEFAULT_SETTINGS: Settings = {
   boss: true,
   sound: true,
   pickMode: 'random',
+  deckSet: 'easy',
 };
 
 export function emptyStats(): Stats {

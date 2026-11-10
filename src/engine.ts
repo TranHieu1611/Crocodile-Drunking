@@ -340,6 +340,9 @@ export const REASON_LABEL: Record<Reason, string> = {
   pushup: 'Hít đất',
   squat: 'Squat',
   exerciseFail: 'Không nổi → uống',
+  betLose: 'Cược sai',
+  betExtra: 'Thua cược → uống thêm',
+  betFree: 'Thoát vòng cược',
   slow: 'Chậm tay',
 };
 
@@ -410,4 +413,22 @@ export function spinCount(values: readonly number[], rng: Rng = Math.random): Co
 
 export function repsValues(ex: ExerciseKind): readonly number[] {
   return CONFIG.REPS[ex];
+}
+
+// ---------- Cược nhanh: vòng quay "Cược thắng" ----------
+
+export interface BetSpin {
+  drink: boolean;
+  index: number;
+  /** Góc kim dừng (độ). Ô 0 = THOÁT, ô 1..n = UỐNG THÊM 1 LY. */
+  angle: number;
+}
+
+/** n người cược thắng → bánh xe có 1 ô THOÁT + n ô UỐNG THÊM, mỗi ô cơ hội như nhau. */
+export function spinBet(winners: number, rng: Rng = Math.random): BetSpin {
+  const slices = Math.max(1, winners) + 1;
+  const index = Math.floor(rng() * slices);
+  const step = 360 / slices;
+  const pad = Math.min(8, step / 5);
+  return { drink: index > 0, index, angle: index * step + pad + rng() * (step - 2 * pad) };
 }

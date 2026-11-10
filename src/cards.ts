@@ -1,4 +1,5 @@
 import raw from '../croc_cards.json';
+import rawEasy from '../croc_cards_easy.json';
 import { CONFIG } from './config';
 
 export type Tag = 'couple' | 'sexy' | 'phone' | 'outside';
@@ -20,12 +21,26 @@ export interface CardData {
   bet_reminder: string;
 }
 
+export type DeckSet = 'easy' | 'main';
+
 export const BASE_CARDS: CardData = {
   hard: raw.hard as Card[],
   buddy: raw.buddy as Card[],
   safe_quips: raw.safe_quips,
   bet_reminder: raw.bet_reminder,
 };
+
+/** Bộ "Dễ thở": nhẹ nhàng, ít đụng chạm — dùng để chơi thử. */
+export const EASY_CARDS: CardData = {
+  hard: rawEasy.hard as Card[],
+  buddy: rawEasy.buddy as Card[],
+  safe_quips: rawEasy.safe_quips,
+  bet_reminder: rawEasy.bet_reminder,
+};
+
+export function baseCards(set: DeckSet = 'easy'): CardData {
+  return set === 'main' ? BASE_CARDS : EASY_CARDS;
+}
 
 export interface CustomCard extends Card {
   deck: DeckName;
@@ -49,11 +64,12 @@ export function saveCustomCards(cards: CustomCard[]): void {
   }
 }
 
-export function mergedCards(custom: CustomCard[]): CardData {
+export function mergedCards(custom: CustomCard[], set: DeckSet = 'easy'): CardData {
+  const base = baseCards(set);
   return {
-    ...BASE_CARDS,
-    hard: [...BASE_CARDS.hard, ...custom.filter((c) => c.deck === 'hard')],
-    buddy: [...BASE_CARDS.buddy, ...custom.filter((c) => c.deck === 'buddy')],
+    ...base,
+    hard: [...base.hard, ...custom.filter((c) => c.deck === 'hard')],
+    buddy: [...base.buddy, ...custom.filter((c) => c.deck === 'buddy')],
   };
 }
 

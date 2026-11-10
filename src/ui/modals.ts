@@ -43,26 +43,41 @@ export function confirmBox(title: string, body: string, yes: string, no: string)
 
 // ---------- Luật chơi ----------
 
+const POISON_N = Object.values(CONFIG.POISON).reduce((s, n) => s + n, 0);
+const P = CONFIG.REPS;
+
 export const SLIDES = [
   {
-    t: 'Cá sấu có 12 răng',
-    b: 'Mỗi hàm, cá sấu giấu <b>7 răng độc</b> trong 12 răng. Bấm <b>Quay chọn người</b>, ai bị gọi tên có <b>5 giây</b> chọn 1 răng. Chậm tay → app chọn hộ và phạt thêm 1 ngụm.',
+    t: `Cá sấu có ${CONFIG.TEETH} răng`,
+    b: `Mỗi hàm, cá sấu giấu <b>${POISON_N} răng độc</b> trong ${CONFIG.TEETH} răng, còn lại là răng an toàn. Ai được gọi tên thì chọn 1 răng trong thời gian đồng hồ (mặc định <b>${CONFIG.PICK_SECONDS_DEFAULT} giây</b>, chỉnh được hoặc tắt). Chậm tay → app chọn hộ và phạt thêm <b>1 ngụm</b>.<br><br><b>Cược nhanh</b>: ai đoán người đang chọn sẽ bị gặm thì bấm tên mình. Đoán sai (răng an toàn) → mỗi người 1 ngụm. Đoán trúng → người bị gặm quay vòng <b>Cược thắng</b>: 1 ô thoát + mỗi người cược trúng thêm 1 ô <b>uống thêm 1 ly</b> (1 người cược = 50/50).`,
   },
   {
-    t: 'Răng Uống ×2',
-    b: 'Dính răng đỏ: hàm sập, <b>quay vòng may mắn</b>. Trúng ô <b>GOD SAVE (10%)</b> thì thoát, còn lại uống <b>1 ly</b>.',
+    t: 'Ai chọn răng?',
+    b: 'Chọn ở màn thiết lập (hoặc Menu giữa ván):<br><b>Ngẫu nhiên</b> — quay chọn bất kỳ, chỉ không trùng người vừa chơi.<br><b>Không lặp</b> — ai chơi rồi thì loại, đủ một vòng mới quay lại.<br><b>Vòng tròn</b> — lần lượt theo chỗ ngồi, app tự gọi người kế tiếp, không cần quay.',
   },
   {
-    t: 'Cực Khó · Uống Cùng · Vòng Quay',
-    b: 'Răng tím: rút 1 <b>thử thách cực khó</b>. Làm được thì qua, chịu thua thì uống <b>2 ly</b>.<br><br>Răng vàng: bạn chắc chắn uống 1 ly, app <b>kéo thêm 1 người</b> làm thử thách cùng. Cả bàn bỏ phiếu cho người bị kéo có thoát hay không.<br><br>Răng cam: <b>quay vòng</b> — trúng <b>MÌNH UỐNG</b> thì bạn uống 1 ly, trúng <b>CẢ BÀN</b> thì cả bàn cùng dzô!',
+    t: `Răng Uống ×${CONFIG.POISON.drink}`,
+    b: `Dính răng đỏ: hàm sập, <b>quay vòng God Save</b>. Trúng ô <b>GOD SAVE (${Math.round(CONFIG.GOD_SAVE * 100)}%)</b> thì thoát nạn, còn lại uống <b>1 ly</b>.`,
+  },
+  {
+    t: 'Cực Khó · Uống Cùng',
+    b: `<b>Răng tím</b>: rút 1 thử thách cực khó, có đồng hồ đếm giờ. Cả bàn công nhận làm được thì qua, chịu thua uống <b>${CONFIG.HARD_FAIL_DRINKS} ly</b>.<br><br><b>Răng vàng</b>: bạn chắc chắn uống 1 ly, app <b>kéo thêm 1 người</b> làm thử thách cùng bạn. Cả bàn bỏ phiếu: OK thì người bị kéo thoát, không OK thì uống cùng bạn.`,
+  },
+  {
+    t: 'Vòng Quay',
+    b: `<b>Răng cam</b>: quay vòng ${Math.round((1 - CONFIG.PARTY_CHANCE) * 100)}/${Math.round(CONFIG.PARTY_CHANCE * 100)} — trúng <b>MÌNH UỐNG</b> thì bạn uống 1 ly, trúng <b>CẢ BÀN</b> thì tất cả cùng dzô 1 ly!`,
   },
   {
     t: 'Hít Đất · Squat',
-    b: 'Răng xanh dương: quay ra số cái <b>hít đất (1–5)</b>. Răng hồng: quay ra số cái <b>squat (4–10)</b>.<br><br>Cả bàn đếm to. Không làm nổi thì <b>uống 1 ly</b> thay thế.',
+    b: `<b>Răng xanh dương</b>: quay ra số cái <b>hít đất (${P.pushup[0]}–${P.pushup[P.pushup.length - 1]})</b>. <b>Răng hồng</b>: quay ra số cái <b>squat (${P.squat[0]}–${P.squat[P.squat.length - 1]})</b>.<br><br>Cả bàn đếm to. Không làm nổi thì <b>uống 1 ly</b> thay thế.`,
   },
   {
-    t: 'Hàm Trùm & an toàn',
-    b: 'Cứ <b>3 hàm</b> có 1 <b>Hàm Trùm</b> với thẻ nặng đô hơn. Thẻ đụng chạm chỉ rút cho người bật <b>OK cặp</b>. Ai lái xe thì bật <b>nước lọc</b>. Uống có trách nhiệm, đã uống thì không lái xe!',
+    t: 'Hết hàm & Hàm Trùm',
+    b: `Hàm kết thúc khi dính đủ <b>${POISON_N} răng độc</b> — riêng chế độ <b>Vòng tròn</b> còn kết thúc khi <b>cả bàn đã chọn đủ 1 lượt</b>. Sau mỗi hàm có bảng tổng kết ai uống bao nhiêu.<br><br>Cứ <b>${CONFIG.BOSS_INTERVAL} hàm</b> có 1 <b>Hàm Trùm</b>: cá sấu có sẹo, thẻ nặng đô hơn. Bấm <b>Kết thúc ván</b> trong Menu để trao danh hiệu cả buổi.`,
+  },
+  {
+    t: 'Chỗ ngồi & an toàn',
+    b: 'Thứ tự người chơi = <b>chỗ ngồi quanh bàn</b> (dời bằng nút ‹ ›) — quyết định "người bên trái/phải" trong thẻ và thứ tự Vòng tròn. Bấm <b>←</b> giữa ván để sửa mà không mất ván.<br><br>Thẻ đụng chạm chỉ rút cho người bật <b>OK cặp</b>. Ai lái xe bật <b>Nước lọc</b>. Uống có trách nhiệm — đã uống thì không lái xe!',
   },
 ];
 

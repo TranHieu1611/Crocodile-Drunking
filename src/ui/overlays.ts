@@ -1,9 +1,9 @@
 import { CONFIG } from '../config';
 import { avatar, icon, nameChip, esc } from './dom';
 import { modal, type ModalHandle } from './modals';
-import { wheelHTML, partyWheelHTML, countWheelHTML, spinWheel, markWin, confetti, ringHTML, setRing } from './fx';
+import { wheelHTML, partyWheelHTML, countWheelHTML, betWheelHTML, spinWheel, markWin, confetti, ringHTML, setRing } from './fx';
 import { store, persist } from './store';
-import { PARTY_SLICES, fillText, playerById, repsValues, spinCount, spinGodSave, spinParty, waterize } from '../engine';
+import { PARTY_SLICES, fillText, playerById, repsValues, spinBet, spinCount, spinGodSave, spinParty, waterize } from '../engine';
 import { sfx, vibrate } from '../audio';
 import type { Pending } from '../state';
 
@@ -12,7 +12,8 @@ export type Outcome =
   | { kind: 'hard'; done: boolean }
   | { kind: 'buddy'; ok: boolean }
   | { kind: 'wheel'; all: boolean }
-  | { kind: 'exercise'; ex: 'pushup' | 'squat'; value: number; done: boolean };
+  | { kind: 'exercise'; ex: 'pushup' | 'squat'; value: number; done: boolean }
+  | { kind: 'bet'; drink: boolean };
 
 function who(id: string): string {
   const p = playerById(store.g!, id);
@@ -160,6 +161,66 @@ export function showOverlay(p: Pending, done: (o: Outcome) => void): ModalHandle
       vibrate(200);
       m.close();
       done({ kind: 'hard', done: false });
+    });
+    return m;
+  }
+
+  if (p.kind === 'bet') {
+    const ws = p.winners.map((id) => g.players.find((x) => x.id === id)).filter((x): x is NonNullable<typeof x> => !!x);
+    const m = modal(
+      `<div class="ov-in">
+        <div class="ov-kicker">${icon('users', 18)} Cược nhanh</div>
+        <h2 class="ov-title">CƯỢC THẮNG!</h2>
+        <div class="bet-win">${ws.map((x) => `<span class="bw-p">${avatar(x, 'sm')}${esc(x.name)}</span>`).join('')}</div>
+        <p class="ov-sure">${ws.length} người đoán trúng ${chip(a)} bị gặm — quay xem ${esc(a.name)} có phải <b>uống thêm 1 ly</b> không</p>
+        ${betWheelHTML(ws.length)}
+        <div class="ov-result" aria-live="polite"></div>
+        <div class="ov-actions">
+          <button class="btn bet-btn big" data-spin>QUAY</button>
+          <button class="btn primary big hidden" data-next>Tiếp tục</button>
+        </div>
+      </div>`,
+      'ov ov-bet',
+      false,
+    );
+    const res = m.el.querySelector('.ov-result') as HTMLElement;
+    const spinBtn = m.el.querySelector('[data-spin]') as HTMLButtonElement;
+    const next = m.el.querySelector('[data-next]') as HTMLButtonElement;
+    const wheel = m.el.querySelector('.wheel-wrap') as HTMLElement;
+    const show = (drink: boolean, fresh: boolean) => {
+      res.innerHTML = drink
+        ? `<div class="res bad"><b>${esc(waterize('Uống thêm 1 ly', a.water))}</b><span>Cả bàn đoán trúng, ${esc(a.name)} chịu trận</span></div>`
+        : `<div class="res save"><b>THOÁT NẠN!</b><span>Cược thắng nhưng ${esc(a.name)} vẫn lách được</span></div>`;
+      if (fresh) {
+        if (drink) {
+          sfx.buzz();
+          vibrate(250);
+        } else {
+          sfx.ting();
+          confetti(m.el.querySelector('.modal-box') as HTMLElement);
+        }
+      }
+      spinBtn.classList.add('hidden');
+      next.classList.remove('hidden');
+      next.focus();
+    };
+    if (p.result && p.angle !== undefined) {
+      (wheel.querySelector('.wheel-rot') as SVGGElement).style.transform = `rotate(${360 - p.angle}deg)`;
+      markWin(wheel, p.angle);
+      show(p.result === 'drink', false);
+    }
+    spinBtn.addEventListener('click', async () => {
+      spinBtn.disabled = true;
+      const r = spinBet(ws.length);
+      p.result = r.drink ? 'drink' : 'free';
+      p.angle = r.angle;
+      persist();
+      await spinWheel(wheel, r.angle);
+      show(r.drink, true);
+    });
+    next.addEventListener('click', () => {
+      m.close();
+      done({ kind: 'bet', drink: p.result === 'drink' });
     });
     return m;
   }

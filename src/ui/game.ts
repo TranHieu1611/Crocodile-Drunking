@@ -139,6 +139,10 @@ export function renderGame(host: HTMLElement): void {
   teeth.addEventListener('pointerleave', () => croc?.lookAt(null));
   host.querySelector('[data-menu]')!.addEventListener('click', openMenu);
   host.querySelector('[data-back]')!.addEventListener('click', backToSetup);
+  host.querySelector('.action')!.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('[data-bet]');
+    if (b) toggleBet(b.dataset.bet!);
+  });
   document.removeEventListener('keydown', onKey);
   document.addEventListener('keydown', onKey);
 
@@ -245,7 +249,7 @@ function drawAction(): void {
     });
   } else if (g.phase === 'picking' && g.current) {
     const p = playerById(g, g.current);
-    const bet = g.settings.bet ? `<p class="bet">${icon('users', 16)}<span>${fillBet(p)}</span></p>` : '';
+    const bet = g.settings.bet ? betBlock(p.id) : '';
     const ring = g.settings.pickSeconds > 0 ? ringHTML() : '';
     el.innerHTML = `<div class="call-card"><div class="call">${ring}<div class="call-m"><span class="call-k">Đến lượt</span><p class="call-t">${nameChip(p)} chọn 1 răng!</p></div></div>${bet}</div>`;
   } else if (g.phase === 'resolving' && g.current) {
@@ -253,8 +257,31 @@ function drawAction(): void {
   }
 }
 
-function fillBet(p: { name: string; color: string; id: string }): string {
-  return esc(cardData().bet_reminder).replace('{A}', nameChip(playerById(store.g!, p.id)));
+/** Cược nhanh: bấm avatar những ai đoán người đang chọn sẽ bị gặm. */
+function betBlock(aId: string): string {
+  const g = store.g!;
+  const bets = new Set(g.bets ?? []);
+  const others = g.players.filter((x) => x.id !== aId);
+  return `<div class="bet-box">
+    <p class="bet">${icon('users', 16)}<span><b>Cược nhanh</b> — ai đoán ${nameChip(playerById(g, aId))} bị gặm thì bấm tên mình<small>Trúng: ${esc(playerById(g, aId).name)} quay vòng uống thêm · Sai: mỗi người 1 ngụm</small></span></p>
+    <div class="bet-chips">${others
+      .map((x) => `<button class="bet-chip${bets.has(x.id) ? ' on' : ''}" data-bet="${x.id}" aria-pressed="${bets.has(x.id)}">${avatar(x, 'sm')}<span>${esc(x.name)}</span></button>`)
+      .join('')}</div>
+  </div>`;
+}
+
+function toggleBet(id: string): void {
+  const g = store.g!;
+  if (g.phase !== 'picking' || busy) return;
+  const s = new Set(g.bets ?? []);
+  if (s.has(id)) s.delete(id);
+  else s.add(id);
+  g.bets = [...s];
+  persist();
+  const b = root.querySelector<HTMLElement>(`[data-bet="${id}"]`);
+  b?.classList.toggle('on', s.has(id));
+  b?.setAttribute('aria-pressed', String(s.has(id)));
+  sfx.tick();
 }
 
 async function shufflePick(): Promise<void> {
@@ -267,6 +294,7 @@ async function shufflePick(): Promise<void> {
   if (btn) btn.disabled = true;
   const mode = g.settings.pickMode ?? 'random';
   const chosen = pickPlayer(g, Math.random);
+  g.bets = [];
   g.phase = 'idle'; // giữ idle cho tới khi hiệu ứng xong (tránh chọn răng sớm)
   // Chế độ "không lặp": chỉ nhảy qua những người chưa chơi trong vòng này.
   const done = new Set((g.picked ?? []).filter((id) => id !== chosen));
@@ -305,7 +333,7 @@ function startPicking(fresh: boolean): void {
   if (!total) return;
   const ring = root.querySelector('.action .ring') as HTMLElement | null;
   if (!ring) return;
-  const lead = fresh && g.settings.bet ? 1800 : 0; // cho cả bàn kịp giơ tay cược
+  const lead = fresh && g.settings.bet ? 3000 : 0; // cho cả bàn kịp bấm cược
   let remain = total;
   setRing(ring, remain, total);
   const startAt = Date.now() + lead;
@@ -332,6 +360,17 @@ async function choose(idx: number, slow: boolean): Promise<void> {
   const a = playerById(g, g.current);
   const kind = revealTooth(g, idx, slow);
   croc?.lookAt(idx);
+  // Chốt danh sách người cược ở lượt này.
+  const bettors = g.settings.bet ? (g.bets ?? []).filter((id) => id !== a.id && g.players.some((x) => x.id === id)) : [];
+  g.bets = [];
+  let betMsg = '';
+  if (kind === 'safe' && bettors.length) {
+    const ps = bettors.map((id) => playerById(g, id));
+    for (const x of ps) addLog(g, x.id, 'betLose', 0, 1);
+    betMsg = ` <span class="bet-res">Cược sai: ${ps.map((x) => nameChip(x)).join(' ')} mỗi người 1 ngụm.</span>`;
+  } else if (kind !== 'safe') {
+    g.betWinners = bettors;
+  }
   const slowMsg = slow
     ? `<b class="warn">Chậm tay!</b> ${nameChip(a)} ${esc(waterize('uống thêm 1 ngụm', a.water))}. `
     : '';
@@ -348,11 +387,11 @@ async function choose(idx: number, slow: boolean): Promise<void> {
     setTimeout(() => croc?.lookAt(null), 600);
     if (roundOver(g)) {
       // Vòng tròn: người cuối cùng của vòng vừa chọn xong.
-      await endRound(`${slowMsg}${esc(quip)}`, 1200);
+      await endRound(`${slowMsg}${esc(quip)}${betMsg}`, 1200);
       return;
     }
     refresh();
-    setMsg(`${slowMsg}${esc(quip)}`);
+    setMsg(`${slowMsg}${esc(quip)}${betMsg}`);
     scheduleAuto(slow ? 2200 : 1500);
     return;
   }
@@ -443,6 +482,14 @@ async function finish(p: Pending, o: Outcome): Promise<void> {
       addLog(g, a.id, 'partySelf', 1);
       msg = `${nameChip(a)} ${esc(waterize('uống 1 ly', a.water))} một mình.`;
     }
+  } else if (o.kind === 'bet') {
+    if (o.drink) {
+      addLog(g, a.id, 'betExtra', 1);
+      msg = `Thua cược: ${nameChip(a)} ${esc(waterize('uống thêm 1 ly', a.water))}!`;
+    } else {
+      addLog(g, a.id, 'betFree');
+      msg = `${nameChip(a)} thoát vòng cược!`;
+    }
   } else if (p.kind === 'buddy' && o.kind === 'buddy') {
     const b = playerById(g, p.b);
     addLog(g, a.id, 'buddyA', 1);
@@ -454,6 +501,19 @@ async function finish(p: Pending, o: Outcome): Promise<void> {
       msg = `${nameChip(a)} và ${nameChip(b)} cùng cạn!`;
     }
   }
+  // Có người cược thắng → quay vòng "Cược thắng" trước khi qua lượt.
+  const winners = (g.betWinners ?? []).filter((id) => id !== a.id && g.players.some((x) => x.id === id));
+  if (p.kind !== 'bet' && winners.length && g.settings.bet) {
+    g.betWinners = [];
+    const bp: Pending = { kind: 'bet', a: a.id, winners };
+    g.pending = bp;
+    persist();
+    setMsg(msg);
+    await wait(250);
+    resolvePending(bp);
+    return;
+  }
+  g.betWinners = [];
   g.pending = null;
   g.phase = 'idle';
   persist();
@@ -504,6 +564,7 @@ function backToSetup(): void {
     } else if (g.picked) {
       g.picked = g.picked.filter((x) => x !== id);
     }
+    g.bets = [];
     g.phase = 'idle';
     g.current = null;
   }

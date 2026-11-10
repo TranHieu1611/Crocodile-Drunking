@@ -2,9 +2,9 @@ import { describe, it, expect } from 'vitest';
 import {
   createGame, makeTeeth, revealTooth, pickPlayer, roundOver, poisonLeft, nextRound, spinGodSave,
   drawHard, drawBuddy, mentionedPlayers, isBossRound, waterize, dangerPct, fillText, randomFreeTooth,
-  spinParty, partySliceIsAll, poisonByKind, POISON_TOTAL, spinCount, repsValues,
+  spinParty, partySliceIsAll, poisonByKind, POISON_TOTAL, spinCount, repsValues, spinBet,
 } from '../src/engine';
-import { BASE_CARDS, type Card, type CardData } from '../src/cards';
+import { BASE_CARDS, EASY_CARDS, type Card, type CardData } from '../src/cards';
 import { DEFAULT_SETTINGS, type Player, type Settings } from '../src/state';
 import { CONFIG } from '../src/config';
 
@@ -319,5 +319,43 @@ describe('Vòng tròn: hết vòng thì hết hàm', () => {
     const safe = g.round.teeth.map((k, i) => (k === 'safe' ? i : -1)).filter((i) => i >= 0);
     for (let t = 0; t < 4; t++) { pickPlayer(g); revealTooth(g, safe[t]); }
     expect(roundOver(g)).toBe(false);
+  });
+});
+
+describe('Cược nhanh: vòng Cược thắng', () => {
+  it('1 người cược → 50/50; n người → n/(n+1) uống thêm; kim đúng ô', () => {
+    const rng = seeded(15);
+    for (const n of [1, 2, 3, 5]) {
+      let drink = 0;
+      const step = 360 / (n + 1);
+      for (let i = 0; i < 12000; i++) {
+        const r = spinBet(n, rng);
+        expect(Math.floor(r.angle / step)).toBe(r.index);
+        expect(r.drink).toBe(r.index > 0);
+        if (r.drink) drink++;
+      }
+      expect(Math.abs(drink / 12000 - n / (n + 1))).toBeLessThan(0.02);
+    }
+  });
+});
+
+describe('Bộ thẻ Dễ thở', () => {
+  it('đúng cấu trúc, id không trùng với bộ chính, lọc couple vẫn đúng', () => {
+    const ids = new Set([...BASE_CARDS.hard, ...BASE_CARDS.buddy].map((c) => c.id));
+    for (const c of [...EASY_CARDS.hard, ...EASY_CARDS.buddy]) {
+      expect(ids.has(c.id)).toBe(false);
+      expect(c.text.length).toBeGreaterThan(10);
+      expect(c.seconds).toBeGreaterThan(0);
+    }
+    expect(EASY_CARDS.hard.some((c) => c.boss)).toBe(true);
+    expect(EASY_CARDS.buddy.some((c) => c.boss)).toBe(true);
+    const g = createGame(players(8), S());
+    for (let i = 0; i < 200; i++) {
+      g.round.n = 1 + (i % 6);
+      expect(drawHard(g, EASY_CARDS, 'p0').card.tags).not.toContain('couple');
+      const r = drawBuddy(g, EASY_CARDS, 'p0');
+      expect(r.card.tags).not.toContain('couple');
+      expect(r.b).not.toBe('p0');
+    }
   });
 });

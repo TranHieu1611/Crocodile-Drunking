@@ -141,13 +141,25 @@ const ART = [
     return `<div class="art-teeth">${kinds.map((k, i) => `<span style="animation-delay:${i * 60}ms">${tooth(col[k])}</span>`).join('')}</div>`;
   },
   () =>
+    `<div class="art-icons"><div class="ai mode">${icon('shuffle', 30)}<span>Ngẫu nhiên</span></div><div class="ai mode">${icon('users', 30)}<span>Không lặp</span></div><div class="ai mode">${icon('refresh', 30)}<span>Vòng tròn</span></div></div>`,
+  () =>
     `<div class="art-wheel"><svg viewBox="0 0 120 120"><circle cx="60" cy="60" r="56" fill="#FF5A4E"/><path d="M60 60 L60 4 A56 56 0 0 1 92.9 14.7 Z" fill="#FFC93C"/><circle cx="60" cy="60" r="56" fill="none" stroke="#FFF6E8" stroke-width="4"/><circle cx="60" cy="60" r="9" fill="#FFF6E8"/></svg><b>10%</b><span>GOD SAVE</span></div>`,
   () =>
-    `<div class="art-pair"><div>${tooth('#C084FC')}<b>2 ly</b><span>nếu chịu thua</span></div><div>${tooth('#FFC93C')}<b>+1 người</b><span>bị kéo theo</span></div><div>${tooth('#FF9F43')}<b>Cả bàn?</b><span>quay mới biết</span></div></div>`,
+    `<div class="art-pair"><div>${tooth('#C084FC')}<b>2 ly</b><span>nếu chịu thua</span></div><div>${tooth('#FFC93C')}<b>+1 người</b><span>bị kéo theo</span></div></div>`,
+  () =>
+    `<div class="art-wheel"><svg viewBox="0 0 120 120">${[0, 1, 2, 3, 4, 5]
+      .map((i) => {
+        const a0 = (i * 60 * Math.PI) / 180, a1 = ((i + 1) * 60 * Math.PI) / 180;
+        const p = (a: number) => `${(60 + 56 * Math.sin(a)).toFixed(1)} ${(60 - 56 * Math.cos(a)).toFixed(1)}`;
+        return `<path d="M60 60 L${p(a0)} A56 56 0 0 1 ${p(a1)} Z" fill="${i % 2 ? '#B8FF3C' : '#FF9F43'}"/>`;
+      })
+      .join('')}<circle cx="60" cy="60" r="56" fill="none" stroke="#FFF6E8" stroke-width="4"/><circle cx="60" cy="60" r="9" fill="#FFF6E8"/></svg><b>50 / 50</b><span>MÌNH · CẢ BÀN</span></div>`,
   () =>
     `<div class="art-icons"><div class="ai pushup">${icon('pushup', 34)}<b>1–5</b><span>Hít đất</span></div><div class="ai squat">${icon('squat', 34)}<b>4–10</b><span>Squat</span></div></div>`,
   () =>
-    `<div class="art-icons"><div class="ai boss">${icon('flag', 30)}<span>Hàm Trùm</span></div><div class="ai couple">${icon('heart', 30)}<span>OK cặp</span></div><div class="ai water">${icon('water', 30)}<span>Nước lọc</span></div></div>`,
+    `<div class="art-icons"><div class="ai mode">${icon('tooth', 30)}<b>7/7</b><span>Hết hàm</span></div><div class="ai boss">${icon('flag', 30)}<b>×3</b><span>Hàm Trùm</span></div><div class="ai mode">${icon('book', 30)}<span>Danh hiệu</span></div></div>`,
+  () =>
+    `<div class="art-icons"><div class="ai mode"><i class="ai-row">${icon('left', 30)}${icon('right', 30)}</i><span>Chỗ ngồi</span></div><div class="ai couple">${icon('heart', 30)}<span>OK cặp</span></div><div class="ai water">${icon('water', 30)}<span>Nước lọc</span></div></div>`,
 ];
 
 export function renderRulesPage(root: HTMLElement): void {

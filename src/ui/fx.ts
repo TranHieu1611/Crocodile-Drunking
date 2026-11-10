@@ -134,6 +134,32 @@ export function countWheelHTML(values: readonly number[], ex: 'pushup' | 'squat'
   <div class="pw-legend"><span><i class="sw ${ex}"></i>Từ ${values[0]} đến ${values[values.length - 1]} cái ${name}, mỗi số cơ hội như nhau</span></div>`;
 }
 
+/** Bánh xe "Cược thắng": 1 ô THOÁT + n ô UỐNG THÊM 1 LY. */
+export function betWheelHTML(winners: number): string {
+  const slices = Math.max(1, winners) + 1;
+  const step = 360 / slices;
+  const size = slices > 5 ? 13 : 16;
+  const segs: Seg[] = Array.from({ length: slices }, (_, i) => ({
+    a0: i * step,
+    a1: (i + 1) * step,
+    cls: i === 0 ? 'bw-free' : `bw-drink${i % 2 ? '' : ' alt'}`,
+    label: (o: number) =>
+      i === 0
+        ? twoLines('THOÁT', 'NẠN', 'w-txt bw-txt-free', 6 * o, size + 2)
+        : mug(0, -34 * o, slices > 5 ? 0.85 : 1) + twoLines('UỐNG', 'THÊM 1 LY', 'w-txt bw-txt', 10 * o, size - 2),
+  }));
+  const free = Math.round(100 / slices);
+  return `
+  <div class="wheel-wrap bw" data-step="${step}">
+    ${POINTER}
+    ${wheelSVG(segs, 'Vòng quay cược thắng', 'QUAY')}
+  </div>
+  <div class="pw-legend">
+    <span><i class="sw bfree"></i>Thoát nạn <em>${free}%</em></span>
+    <span><i class="sw bdrink"></i>Uống thêm 1 ly <em>${100 - free}%</em></span>
+  </div>`;
+}
+
 /** Làm nổi ô đang nằm dưới kim ở góc `angle`. */
 export function markWin(root: HTMLElement, angle: number): void {
   const a = ((angle % 360) + 360) % 360;

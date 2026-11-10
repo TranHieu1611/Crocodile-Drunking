@@ -67,3 +67,54 @@
 .phelp .ic + .ic { margin-left: -3px; }
 .mini-tg.wide input:checked + span { background: #4FC3F7; color: #04202B; box-shadow: none; opacity: 1; }
 .mini-tg.wide input:checked + span .ic { color: #04202B; }
+.ai.mode { color: var(--lime); }
+.ai .ic + .ic { margin-left: -14px; }
+.art-icons .ai { width: 104px; }
+/* Luật chơi: nút điều hướng luôn thấy được */
+.rp-foot { position: sticky; bottom: 0; padding: 10px 0 calc(4px + var(--safe-b)); background: linear-gradient(transparent, var(--bg) 30%); }
+@media (max-height: 760px) {
+  .rp-body { padding: 6px 2px; }
+  .rp-art { min-height: 0; margin-bottom: 12px; transform: scale(.82); }
+  .art-teeth { grid-template-columns: repeat(6, 32px); gap: 6px 10px; }
+  .art-teeth .rt { width: 32px; height: 35px; }
+  .rp-title { font-size: 26px; margin-bottom: 6px; }
+  .rp-text { font-size: 15px; line-height: 1.5; }
+}
+.ai-row { display: flex; font-style: normal; }
+.ai-row .ic + .ic { margin-left: -8px; }
+
+/* ===== Cược nhanh ===== */
+:root { --bet: #FFC93C; --bet-bg: #1F1A04; }
+.bet-box { border-top: 1px dashed var(--border); padding-top: 8px; display: flex; flex-direction: column; gap: 8px; }
+.call-card .bet-box .bet { border: 0; padding: 0; }
+.bet-chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.bet-chip {
+  display: inline-flex; align-items: center; gap: 6px; min-height: 34px; padding: 3px 10px 3px 4px;
+  border-radius: 99px; border: 1.5px solid var(--border); background: var(--bg);
+  font-size: 13px; font-weight: 700; color: var(--muted); transition: background .12s, border-color .12s, color .12s;
+}
+.bet-chip .av { --s: 24px; }
+.bet-chip.on { border-color: var(--bet); background: rgba(255, 201, 60, .16); color: var(--text); }
+.bet-chip.on::after { content: "✓"; color: var(--bet); font-weight: 800; }
+.bet-res { color: var(--bet); }
+.ov-bet .modal-box { background: var(--bet-bg); --k: var(--bet); }
+.btn.bet-btn { background: var(--bet); color: var(--bet-bg); font-weight: 800; }
+.bet-win { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; }
+.bw-p { display: inline-flex; align-items: center; gap: 6px; padding: 3px 10px 3px 4px; border-radius: 99px; background: rgba(255, 201, 60, .14); border: 1px solid var(--bet); font-weight: 700; font-size: 14px; }
+.bw-p .av { --s: 24px; }
+.bw-free { fill: var(--lime); }
+.bw-drink { fill: var(--red); }
+.bw-drink.alt { fill: #D63E34; }
+.bw-txt-free { fill: var(--on-lime); }
+.bw-txt { fill: var(--red-bg); }
+.sw.bfree { background: var(--lime); }
+.sw.bdrink { background: var(--red); }
+.chip.r-betLose { background: #4D3D12; color: #FFE7A3; }
+.chip.r-betExtra { background: var(--bet); color: var(--bet-bg); }
+.chip.r-betFree { background: #3A4A3E; color: var(--text); }
+@media (max-height: 700px) {
+  .bet-chip { min-height: 30px; font-size: 12px; }
+  .bet-chip .av { --s: 20px; }
+}
+.g-side > * { flex-shrink: 0; }
+.bet small { display: block; margin-top: 2px; font-size: 11.5px; color: var(--muted); opacity: .85; }

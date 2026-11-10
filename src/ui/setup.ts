@@ -88,6 +88,12 @@ export function renderSetup(root: HTMLElement): void {
 
     <div class="sec-title"><span>Cài đặt</span></div>
     <div class="settings">
+      <div class="set-row col"><div><div class="set-t">Bộ thẻ thử thách</div><div class="set-d ds-desc"></div></div>
+        <div class="seg ds">
+          <button data-ds="easy" class="${(s.deckSet ?? 'easy') === 'easy' ? 'on' : ''}">Dễ thở</button>
+          <button data-ds="main" class="${s.deckSet === 'main' ? 'on' : ''}">Chính (nặng đô)</button>
+        </div>
+      </div>
       <div class="set-row col"><div><div class="set-t">Cách chọn người</div><div class="set-d pm-desc"></div></div>
         <div class="seg pm">${PICK_MODES.map(
           ([m, label]) => `<button data-pm="${m}" class="${(s.pickMode ?? 'random') === m ? 'on' : ''}">${label}</button>`,
@@ -203,6 +209,21 @@ export function renderSetup(root: HTMLElement): void {
     if (!b) return;
     store.settings.pickSeconds = Number(b.dataset.sec);
     root.querySelectorAll('.seg.secs button').forEach((x) => x.classList.toggle('on', x === b));
+    saveRoster();
+  });
+  const dsDesc = root.querySelector('.ds-desc') as HTMLElement;
+  const showDs = () =>
+    (dsDesc.textContent =
+      (store.settings.deckSet ?? 'easy') === 'easy'
+        ? 'Nhẹ nhàng, hầu hết làm được ngay — hợp để khởi động'
+        : 'Đủ đô hơn: có 18+, gọi điện, điện thoại riêng (tắt bớt bằng công tắc bên dưới)');
+  showDs();
+  root.querySelector('.seg.ds')!.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('button');
+    if (!b) return;
+    store.settings.deckSet = b.dataset.ds as 'easy' | 'main';
+    root.querySelectorAll('.seg.ds button').forEach((x) => x.classList.toggle('on', x === b));
+    showDs();
     saveRoster();
   });
   const pmDesc = root.querySelector('.pm-desc') as HTMLElement;
