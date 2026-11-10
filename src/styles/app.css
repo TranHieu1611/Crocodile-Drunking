@@ -443,7 +443,7 @@ code { background: var(--surface2); padding: 0 4px; border-radius: 4px; font-siz
 .pair-arrow { width: 54px; color: var(--yellow); }
 
 .wheel-wrap { position: relative; width: min(74vw, 290px, 38dvh); aspect-ratio: 1; margin-top: 8px; }
-.wheel { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .5)); }
+svg.wheel { width: 100%; height: 100%; display: block; filter: drop-shadow(0 8px 24px rgba(0, 0, 0, .5)); }
 .wheel-rot { transform-box: view-box; transform-origin: 150px 150px; }
 .wheel-pointer { position: absolute; top: -16px; left: 50%; width: 38px; transform: translateX(-50%); z-index: 2; fill: var(--cream); filter: drop-shadow(0 2px 4px rgba(0, 0, 0, .6)); }
 .w-save { fill: var(--yellow); }

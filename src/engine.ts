@@ -88,16 +88,45 @@ export function dangerPct(g: GameState): number {
   return left === 0 ? 0 : Math.round((poisonLeft(g) / left) * 100);
 }
 
+/** Chế độ vòng tròn: mọi người đã chọn răng đủ một lượt trong hàm này. */
+export function lapDone(g: GameState): boolean {
+  return (g.settings.pickMode ?? 'random') === 'circle' && (g.round.turns ?? 0) >= g.players.length;
+}
+
+/** Hết hàm khi dính đủ răng độc — hoặc (vòng tròn) cả bàn đã chọn đủ một lượt. */
 export function roundOver(g: GameState): boolean {
-  return poisonLeft(g) === 0;
+  return poisonLeft(g) === 0 || lapDone(g);
 }
 
 // ---------- Người chơi ----------
 
-/** Chọn ngẫu nhiên 1 người, không trùng người vừa chơi lượt trước. */
+/**
+ * Chọn người chơi lượt tiếp theo theo chế độ:
+ * - random: ngẫu nhiên, không trùng người vừa chơi.
+ * - bag: ngẫu nhiên nhưng ai đã chơi thì loại ra, đủ một vòng mới làm lại.
+ * - circle: lần lượt theo thứ tự chỗ ngồi.
+ */
 export function pickPlayer(g: GameState, rng: Rng = Math.random): string {
-  const pool = g.players.length > 1 ? g.players.filter((p) => p.id !== g.last) : g.players;
-  const p = pickOne(pool, rng);
+  const mode = g.settings.pickMode ?? 'random';
+  let p: Player;
+  if (mode === 'circle') {
+    const i = g.players.findIndex((x) => x.id === g.last);
+    p = g.players[(i + 1) % g.players.length];
+  } else if (mode === 'bag') {
+    const ids = new Set(g.players.map((x) => x.id));
+    let done = (g.picked ?? []).filter((id) => ids.has(id));
+    let pool = g.players.filter((x) => !done.includes(x.id));
+    if (!pool.length) {
+      done = [];
+      // Vòng mới: vẫn tránh lặp lại người vừa chơi.
+      pool = g.players.length > 1 ? g.players.filter((x) => x.id !== g.last) : g.players;
+    }
+    p = pickOne(pool, rng);
+    g.picked = [...done, p.id];
+  } else {
+    const pool = g.players.length > 1 ? g.players.filter((x) => x.id !== g.last) : g.players;
+    p = pickOne(pool, rng);
+  }
   g.current = p.id;
   g.last = p.id;
   g.phase = 'picking';
@@ -137,6 +166,7 @@ export function revealTooth(g: GameState, idx: number, slow = false): ToothKind 
   if (g.round.revealed[idx]) throw new Error('Răng đã bị chọn');
   if (!g.current) throw new Error('Chưa chọn người');
   g.round.revealed[idx] = true;
+  g.round.turns = (g.round.turns ?? 0) + 1;
   const kind = g.round.teeth[idx];
   if (slow) addLog(g, g.current, 'slow', 0, 1);
   if (kind !== 'safe') g.stats[g.current].bitten++;

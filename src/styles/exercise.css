@@ -39,3 +39,155 @@
   .lgd-m b { font-size: 13.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
   .lgd-n { font-size: 19px; }
 }
+
+/* Chế độ chọn người */
+.pb.played { opacity: .32; filter: grayscale(.6); }
+.pick-sub { margin-top: 6px; text-align: center; font-size: 12.5px; color: var(--muted); font-weight: 600; }
+.seg.pm button { font-size: 13.5px; }
+@media (min-width: 900px) { .pick-sub { text-align: left; } }
+
+/* Nút quay lại + thanh ván đang chơi */
+.game .ghead { grid-template-columns: auto auto 1fr 1fr auto; }
+.gh-back { width: 40px; height: 40px; }
+.resume-bar {
+  display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
+  background: rgba(184, 255, 60, .08); border: 1.5px solid var(--lime); border-radius: 16px;
+  padding: 12px 14px; margin: 4px 0 6px;
+}
+.rb-m { display: flex; align-items: flex-start; gap: 10px; color: var(--lime); }
+.rb-m span { color: var(--text); font-size: 14.5px; display: flex; flex-direction: column; }
+.rb-m small { color: var(--muted); font-size: 12.5px; margin-top: 2px; }
+.resume-bar .btn { flex: 1 1 auto; }
+@media (min-width: 900px) {
+  .resume-bar { grid-column: 1 / -1; }
+  .resume-bar .btn { flex: 0 0 auto; }
+}
+@media (max-width: 400px) {
+  .game .ghead { gap: 6px; }
+  .gh-back { width: 36px; height: 36px; }
+  .gh-round { min-width: 46px; }
+}
+
+/* ===== Header màn chơi: cân đối, chữ rõ ===== */
+.game .ghead {
+  grid-template-columns: auto auto 1fr 1fr auto;
+  grid-template-areas: "back round poison danger menu";
+  gap: 8px;
+}
+.gh-back { grid-area: back; }
+.gh-round { grid-area: round; }
+.st-poison { grid-area: poison; }
+.st-danger { grid-area: danger; }
+.gh-menu { grid-area: menu; }
+.gh-stat {
+  background: rgba(22, 38, 27, .75); border: 1px solid var(--border); border-radius: 12px;
+  padding: 5px 9px; justify-content: center; align-self: stretch;
+}
+.gh-stat .lbl { font-size: 11px; color: var(--muted); }
+.gh-stat b { font-size: 22px; }
+.st-danger.hot { border-color: var(--red); background: rgba(255, 90, 78, .12); }
+
+@media (min-width: 900px) {
+  .game .ghead {
+    grid-template-columns: auto auto 1fr auto;
+    grid-template-areas:
+      "back round . menu"
+      "poison poison danger danger";
+    row-gap: 12px;
+  }
+  .gh-round { flex-direction: row; align-items: baseline; gap: 8px; padding: 8px 16px; border-radius: 12px; min-width: 0; }
+  .gh-round .lbl { font-size: 13px; letter-spacing: .14em; }
+  .gh-round b { font-size: 26px; padding-top: 0; }
+  .gh-back, .gh-menu { width: 44px; height: 44px; }
+  .gh-stat { padding: 10px 14px; border-radius: 14px; gap: 2px; }
+  .gh-stat .lbl { font-size: 13px; font-weight: 700; white-space: nowrap; overflow: visible; }
+  .gh-stat b { font-size: 34px; line-height: 1; }
+}
+.setup-head .resume-bar { align-self: stretch; width: 100%; text-align: left; margin-top: 10px; }
+@media (min-width: 900px) {
+  .setup-head .resume-bar { flex-basis: 100%; order: 4; }
+}
+
+/* Nhãn HÀM: chữ và số cùng font, cùng cỡ, cân đối */
+.gh-round {
+  flex-direction: row; align-items: center; justify-content: center; gap: 6px;
+  height: 44px; padding: 0 14px; border-radius: 12px; min-width: 0; line-height: 1;
+}
+.gh-round .lbl, .gh-round b {
+  font-family: var(--f-title); font-weight: 800; font-size: 20px; line-height: 1;
+  letter-spacing: 0; text-transform: none; padding-top: 3px;
+}
+@media (min-width: 900px) {
+  .gh-round { height: 44px; padding: 0 18px; gap: 7px; }
+  .gh-round .lbl, .gh-round b { font-size: 22px; letter-spacing: 0; }
+}
+@media (max-width: 400px) {
+  .gh-round { padding: 0 10px; gap: 4px; }
+  .gh-round .lbl, .gh-round b { font-size: 17px; }
+}
+
+/* Vòng tròn: thẻ "Tiếp theo" thay cho nút quay */
+.next-up {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  min-height: 62px; padding: 8px 12px; border-radius: 14px;
+  background: rgba(184, 255, 60, .08); border: 1.5px dashed rgba(184, 255, 60, .5);
+}
+.nu-m { display: flex; flex-direction: column; gap: 4px; min-width: 0; }
+.nu-l { font-size: 11.5px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--lime); }
+.nu-p { display: inline-flex; align-items: center; gap: 8px; font-size: 18px; font-weight: 800; animation: nuPulse 1.2s ease-in-out infinite; }
+@keyframes nuPulse { 50% { opacity: .55; } }
+
+/* ===== Thẻ "Đến lượt" — thoáng, cân đối ===== */
+.call-card {
+  display: flex; flex-direction: column; gap: 8px;
+  background: rgba(22, 38, 27, .78); border: 1px solid var(--border); border-radius: 16px;
+  padding: 10px 12px;
+}
+.call-card.bitten { border-color: var(--red); background: rgba(255, 90, 78, .1); }
+.call { display: flex; flex-direction: row; align-items: center; gap: 12px; }
+.call-m { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+.call-k { font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: var(--lime); }
+.call-card.bitten .call-k { color: var(--red); }
+.call-t { font-size: 18px; font-weight: 800; line-height: 1.3; }
+.call-card .bet { border-top: 1px dashed var(--border); padding-top: 8px; margin: 0; }
+.action .ring { width: 52px; height: 52px; }
+
+@media (min-width: 900px) {
+  .game .g-side { gap: 20px; }
+  .game .pbar { padding-bottom: 4px; }
+  .game .action { min-height: 132px; justify-content: flex-start; gap: 8px; }
+  .call-card { padding: 14px 16px; gap: 10px; }
+  .call { flex-direction: row; align-items: center; gap: 16px; }
+  .call-t { font-size: 22px; }
+  .action .ring { width: 60px; height: 60px; }
+  .call-card .bet { font-size: 13.5px; line-height: 1.5; }
+  .next-up { min-height: 72px; padding: 12px 16px; }
+  .spin-btn { min-height: 64px; }
+  .game .msg { min-height: 40px; padding: 0 2px; }
+}
+@media (max-height: 700px) {
+  .call-card { padding: 7px 10px; gap: 6px; }
+  .call-t { font-size: 16px; }
+  .action .ring { width: 46px; height: 46px; }
+}
+
+/* Thông báo nằm ngay dưới khu hành động, khoảng cách vừa phải */
+@media (min-width: 900px) {
+  .game .action { min-height: 0; }
+  .game .msg {
+    min-height: 0; margin-top: -4px; justify-content: flex-start;
+    font-size: 15.5px; line-height: 1.45; color: var(--text);
+  }
+  .game .msg:empty { display: none; }
+  .game .legend { margin-top: auto; padding-top: 8px; }
+}
+
+/* Avatar đang được chọn: phóng to lên phía trên, không đè tên bên dưới */
+.pb { gap: 5px; }
+.pb .av { transform-origin: 50% 100%; }
+.pb.on .av { transform: scale(1.12) translateY(-2px); }
+.pb.on > span:last-child { position: relative; z-index: 1; }
+@media (min-width: 900px) {
+  .game .pbar .pb { width: auto; min-width: 0; }
+  .game .pbar { padding-top: 4px; }
+}

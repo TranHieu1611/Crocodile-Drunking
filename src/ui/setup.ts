@@ -1,12 +1,23 @@
 import { CONFIG } from '../config';
-import { esc, icon, initials } from './dom';
+import { ANIMALS, avatarInner, esc, icon, initials } from './dom';
 import { store, nav, saveRoster, newId, freeColor, displayName, persist } from './store';
-import { showRules } from './modals';
+import { showRules, confirmBox, modal } from './modals';
 import { createGame } from '../engine';
 import { setSound, unlockAudio } from '../audio';
-import type { Settings } from '../state';
+import { emptyStats, type PickMode, type Player, type Settings } from '../state';
 
-type BoolKey = { [K in keyof Settings]: Settings[K] extends boolean ? K : never }[keyof Settings];
+const PICK_MODES: Array<[PickMode, string]> = [
+  ['random', 'Ngẫu nhiên'],
+  ['bag', 'Không lặp'],
+  ['circle', 'Vòng tròn'],
+];
+const PICK_MODE_DESC: Record<PickMode, string> = {
+  random: 'Quay ngẫu nhiên, chỉ không trùng người vừa chơi',
+  bag: 'Quay ngẫu nhiên, ai chơi rồi thì loại — đủ một vòng mới quay lại',
+  circle: 'Lần lượt theo thứ tự chỗ ngồi (người 1 → 2 → 3 …)',
+};
+
+type BoolKey = { [K in keyof Settings]-?: Settings[K] extends boolean ? K : never }[keyof Settings];
 
 const TOGGLES: Array<[BoolKey, string, string]> = [
   ['sexy', 'Thử thách 18+', 'Thẻ gợi cảm, nóng bỏng'],
@@ -43,10 +54,21 @@ export function renderSetup(root: HTMLElement): void {
       <h1 class="title">Răng Cá Sấu</h1>
       <p class="sub"><span class="only-m">Game nhậu chuyền tay · 1 điện thoại giữa bàn</span><span class="only-d">Game nhậu cho 2–12 người · mở trên laptop hoặc chuyền tay điện thoại</span></p>
       <button class="link" data-rules>${icon('book', 18)} Luật chơi</button>
+      ${
+        store.g
+          ? `<div class="resume-bar"><div class="rb-m">${icon('flag', 18)}<span><b>Ván đang chơi · Hàm ${store.g.round.n} · ${store.g.players.length} người</b><small>Sửa người chơi / cài đặt bên dưới rồi bấm “Chơi tiếp”</small></span></div><button class="btn primary" data-resume>${icon('play', 18)} Chơi tiếp ván này</button></div>`
+          : ''
+      }
     </header>
 
     <div class="setup-players">
-    <div class="sec-title"><span>Người chơi <b class="count"></b></span><span class="hint"><span class="only-m">Chạm</span><span class="only-d">Bấm</span> avatar để đổi màu · thứ tự = chỗ ngồi</span></div>
+    <div class="sec-title"><span>Người chơi <b class="count"></b></span><span class="hint">Thứ tự = chỗ ngồi quanh bàn</span></div>
+    <div class="phelp">
+      <span>${icon('refresh', 14)} <b>Bấm avatar</b> để chọn con vật &amp; màu</span>
+      <span>${icon('left', 14)}${icon('right', 14)} <b>Dời chỗ</b> để xếp đúng chỗ ngồi (ảnh hưởng thẻ “người bên trái/phải” và chế độ Vòng tròn)</span>
+      <span><i class="tg-mini"></i> <b>OK cặp</b>: đồng ý nhận thử thách đụng chạm (ôm, ngồi đùi, nhảy slow…)</span>
+      <span>${icon('water', 14)} <b>Nước lọc</b>: ai lái xe thì uống nước lọc thay rượu bia</span>
+    </div>
     <div class="pgrid"></div>
     <button class="btn ghost wide" data-add>${icon('plus')} Thêm người chơi</button>
     </div>
@@ -66,11 +88,16 @@ export function renderSetup(root: HTMLElement): void {
 
     <div class="sec-title"><span>Cài đặt</span></div>
     <div class="settings">
+      <div class="set-row col"><div><div class="set-t">Cách chọn người</div><div class="set-d pm-desc"></div></div>
+        <div class="seg pm">${PICK_MODES.map(
+          ([m, label]) => `<button data-pm="${m}" class="${(s.pickMode ?? 'random') === m ? 'on' : ''}">${label}</button>`,
+        ).join('')}</div>
+      </div>
       ${TOGGLES.map(
         ([k, t, d]) => `<div class="set-row"><div><div class="set-t">${t}</div><div class="set-d">${d}</div></div>${toggle(`data-set="${k}"`, s[k])}</div>`,
       ).join('')}
       <div class="set-row col"><div><div class="set-t">Đồng hồ chọn răng</div><div class="set-d">Hết giờ: app chọn hộ + phạt 1 ngụm</div></div>
-        <div class="seg">${CONFIG.PICK_SECONDS_OPTIONS.map(
+        <div class="seg secs">${CONFIG.PICK_SECONDS_OPTIONS.map(
           (n) => `<button data-sec="${n}" class="${s.pickSeconds === n ? 'on' : ''}">${n ? n + 's' : 'Tắt'}</button>`,
         ).join('')}</div>
       </div>
@@ -78,7 +105,7 @@ export function renderSetup(root: HTMLElement): void {
     <button class="link center" data-cards>${icon('cards', 18)} Thêm thẻ của hội</button>
     </div>
 
-    <div class="start-bar"><button class="btn primary big" data-start>Mở miệng cá sấu</button></div>
+    <div class="start-bar"><button class="btn primary big" data-start>${store.g ? 'Bắt đầu ván mới' : 'Mở miệng cá sấu'}</button></div>
   </section>`;
 
   const grid = root.querySelector('.pgrid') as HTMLElement;
@@ -86,15 +113,20 @@ export function renderSetup(root: HTMLElement): void {
     grid.innerHTML = store.roster
       .map(
         (p, i) => `<div class="pcard" data-id="${p.id}">
-        <button class="av av-btn" style="--pc:${p.color}" data-color aria-label="Đổi màu"><span class="av-in">${esc(initials(displayName(p, i)))}</span></button>
+        <span class="seat" title="Chỗ ngồi số ${i + 1}">${i + 1}</span>
+        <button class="av av-btn${p.animal ? ' has-emo' : ''}" style="--pc:${p.color}" data-avatar aria-label="Chọn avatar">${avatarInner(p, displayName(p, i))}<span class="av-edit">${icon('refresh', 11)}</span></button>
         <div class="pcard-main">
           <input class="pname" value="${esc(p.name)}" placeholder="Người ${i + 1}" maxlength="16" aria-label="Tên người chơi ${i + 1}" enterkeyhint="next">
           <div class="pcard-tgs">
             ${toggle('data-k="couple"', p.couple, '<span class="tg-l">OK cặp</span>')}
-            <label class="mini-tg" title="Nước lọc (lái xe)"><input type="checkbox" data-k="water" ${p.water ? 'checked' : ''}><span>${icon('water', 16)}</span></label>
+            <label class="mini-tg wide" title="Nước lọc: ai lái xe thì uống nước lọc thay rượu bia"><input type="checkbox" data-k="water" ${p.water ? 'checked' : ''}><span>${icon('water', 15)}<em>Nước lọc</em></span></label>
           </div>
         </div>
-        <button class="icon-btn sm pdel" data-del aria-label="Xóa" ${store.roster.length <= CONFIG.MIN_PLAYERS ? 'disabled' : ''}>${icon('x', 16)}</button>
+        <div class="pcard-tools">
+          <button class="icon-btn sm" data-move="-1" aria-label="Dời lên trước" title="Dời lên trước" ${i === 0 ? 'disabled' : ''}>${icon('left', 15)}</button>
+          <button class="icon-btn sm" data-move="1" aria-label="Dời ra sau" title="Dời ra sau" ${i === store.roster.length - 1 ? 'disabled' : ''}>${icon('right', 15)}</button>
+          <button class="icon-btn sm" data-del aria-label="Xóa" title="Xóa người chơi" ${store.roster.length <= CONFIG.MIN_PLAYERS ? 'disabled' : ''}>${icon('x', 15)}</button>
+        </div>
       </div>`,
       )
       .join('');
@@ -110,7 +142,7 @@ export function renderSetup(root: HTMLElement): void {
     const p = store.roster[idx];
     if (t.classList.contains('pname')) {
       p.name = t.value;
-      card.querySelector('.av-in')!.textContent = initials(displayName(p, idx));
+      if (!p.animal) card.querySelector('.av-in')!.textContent = initials(displayName(p, idx));
     } else if (t.dataset.k === 'couple') p.couple = t.checked;
     else if (t.dataset.k === 'water') p.water = t.checked;
     saveRoster();
@@ -129,17 +161,21 @@ export function renderSetup(root: HTMLElement): void {
     const card = t.closest('.pcard') as HTMLElement | null;
     if (!card) return;
     const p = store.roster.find((x) => x.id === card.dataset.id)!;
-    if (t.closest('[data-color]')) {
-      const used = store.roster.filter((x) => x !== p).map((x) => x.color);
-      const cols = CONFIG.PLAYER_COLORS;
-      let i = cols.indexOf(p.color);
-      for (let k = 0; k < cols.length; k++) {
-        i = (i + 1) % cols.length;
-        if (!used.includes(cols[i])) break;
-      }
-      p.color = cols[i];
-      (t.closest('[data-color]') as HTMLElement).style.setProperty('--pc', p.color);
+    const mv = t.closest<HTMLElement>('[data-move]');
+    if (t.closest('[data-avatar]')) {
+      const idx = store.roster.indexOf(p);
+      pickAvatar(p, displayName(p, idx), () => {
+        saveRoster();
+        draw();
+      });
+    } else if (mv) {
+      const i = store.roster.indexOf(p);
+      const j = i + Number(mv.dataset.move);
+      if (j < 0 || j >= store.roster.length) return;
+      [store.roster[i], store.roster[j]] = [store.roster[j], store.roster[i]];
       saveRoster();
+      draw();
+      grid.querySelector<HTMLElement>(`.pcard[data-id="${p.id}"]`)?.classList.add('moved');
     } else if (t.closest('[data-del]')) {
       store.roster = store.roster.filter((x) => x !== p);
       saveRoster();
@@ -162,11 +198,22 @@ export function renderSetup(root: HTMLElement): void {
     if (k === 'sound') setSound(t.checked);
     saveRoster();
   });
-  root.querySelector('.seg')!.addEventListener('click', (e) => {
+  root.querySelector('.seg.secs')!.addEventListener('click', (e) => {
     const b = (e.target as HTMLElement).closest('button');
     if (!b) return;
     store.settings.pickSeconds = Number(b.dataset.sec);
-    root.querySelectorAll('.seg button').forEach((x) => x.classList.toggle('on', x === b));
+    root.querySelectorAll('.seg.secs button').forEach((x) => x.classList.toggle('on', x === b));
+    saveRoster();
+  });
+  const pmDesc = root.querySelector('.pm-desc') as HTMLElement;
+  const showPm = () => (pmDesc.textContent = PICK_MODE_DESC[store.settings.pickMode ?? 'random']);
+  showPm();
+  root.querySelector('.seg.pm')!.addEventListener('click', (e) => {
+    const b = (e.target as HTMLElement).closest<HTMLElement>('button');
+    if (!b) return;
+    store.settings.pickMode = b.dataset.pm as PickMode;
+    root.querySelectorAll('.seg.pm button').forEach((x) => x.classList.toggle('on', x === b));
+    showPm();
     saveRoster();
   });
   root.querySelector('[data-rules]')!.addEventListener('click', showRules);
@@ -174,19 +221,93 @@ export function renderSetup(root: HTMLElement): void {
     store.back = 'setup';
     nav('cards');
   });
-  root.querySelector('[data-start]')!.addEventListener('click', () => {
+  root.querySelector('[data-start]')!.addEventListener('click', async () => {
     unlockAudio();
-    const players = store.roster.map((p, i) => ({ ...p, name: displayName(p, i).trim() }));
-    // Trùng tên → thêm số để phân biệt.
-    const seen = new Map<string, number>();
-    for (const p of players) {
-      const k = p.name.toLowerCase();
-      const n = (seen.get(k) ?? 0) + 1;
-      seen.set(k, n);
-      if (n > 1) p.name = `${p.name} ${n}`;
+    if (store.g) {
+      const ok = await confirmBox(
+        'Bắt đầu ván mới?',
+        `Ván đang chơi (Hàm ${store.g.round.n}) sẽ bị bỏ. Muốn giữ ván thì bấm “Chơi tiếp ván này”.`,
+        'Ván mới',
+        'Không',
+      );
+      if (!ok) return;
     }
-    store.g = createGame(players, { ...store.settings });
+    store.g = createGame(finalPlayers(), { ...store.settings });
     persist();
     nav('game');
   });
+  root.querySelector('[data-resume]')?.addEventListener('click', () => {
+    unlockAudio();
+    applyToCurrentGame();
+    nav('game');
+  });
+}
+
+/** Bảng chọn avatar: con vật + màu nền. */
+function pickAvatar(p: Player, name: string, done: () => void): void {
+  const used = store.roster.filter((x) => x !== p).map((x) => x.color);
+  const m = modal(`
+    <div class="avp">
+      <div class="m-head"><h2 class="m-title">Avatar của ${esc(name)}</h2><button class="icon-btn" data-close aria-label="Đóng">${icon('x')}</button></div>
+      <div class="avp-preview"><span class="av lg avp-av" style="--pc:${p.color}"></span></div>
+      <p class="avp-t">Con vật</p>
+      <div class="avp-grid">
+        <button class="avp-a txt" data-a="" title="Chữ cái đầu tên">${esc(initials(name))}</button>
+        ${ANIMALS.map(([e, n]) => `<button class="avp-a" data-a="${e}" title="${n}" aria-label="${n}">${e}</button>`).join('')}
+      </div>
+      <p class="avp-t">Màu nền</p>
+      <div class="avp-cols">${CONFIG.PLAYER_COLORS.map(
+        (c) => `<button class="avp-c${used.includes(c) ? ' used' : ''}" data-c="${c}" style="--pc:${c}" title="${used.includes(c) ? 'Người khác đang dùng' : ''}" aria-label="Màu ${c}"></button>`,
+      ).join('')}</div>
+      <button class="btn primary wide" data-close>Xong</button>
+    </div>`);
+  const prev = m.el.querySelector('.avp-av') as HTMLElement;
+  const paint = () => {
+    prev.style.setProperty('--pc', p.color);
+    prev.classList.toggle('has-emo', !!p.animal);
+    prev.innerHTML = avatarInner(p, name);
+    m.el.querySelectorAll<HTMLElement>('.avp-a').forEach((b) => b.classList.toggle('on', (b.dataset.a || undefined) === p.animal));
+    m.el.querySelectorAll<HTMLElement>('.avp-c').forEach((b) => b.classList.toggle('on', b.dataset.c === p.color));
+  };
+  paint();
+  m.el.querySelector('.avp')!.addEventListener('click', (e) => {
+    const t = e.target as HTMLElement;
+    const a = t.closest<HTMLElement>('[data-a]');
+    const c = t.closest<HTMLElement>('[data-c]');
+    if (a) p.animal = a.dataset.a || undefined;
+    else if (c) p.color = c.dataset.c!;
+    else return;
+    paint();
+    done();
+  });
+}
+
+/** Tên cuối cùng (điền tên mặc định, thêm số nếu trùng). */
+function finalPlayers(): Player[] {
+  const players = store.roster.map((p, i) => ({ ...p, name: displayName(p, i).trim() }));
+  const seen = new Map<string, number>();
+  for (const p of players) {
+    const k = p.name.toLowerCase();
+    const n = (seen.get(k) ?? 0) + 1;
+    seen.set(k, n);
+    if (n > 1) p.name = `${p.name} ${n}`;
+  }
+  return players;
+}
+
+/** Áp dụng người chơi + cài đặt vừa sửa vào ván đang chơi (giữ nguyên hàm, răng, thống kê). */
+function applyToCurrentGame(): void {
+  const g = store.g!;
+  g.settings = { ...store.settings };
+  g.players = finalPlayers();
+  const ids = new Set(g.players.map((p) => p.id));
+  for (const p of g.players) g.stats[p.id] ??= emptyStats();
+  if (g.current && !ids.has(g.current)) {
+    g.current = null;
+    if (g.phase === 'picking') g.phase = 'idle';
+  }
+  if (g.last && !ids.has(g.last)) g.last = null;
+  if (g.picked) g.picked = g.picked.filter((id) => ids.has(id));
+  setSound(g.settings.sound);
+  persist();
 }

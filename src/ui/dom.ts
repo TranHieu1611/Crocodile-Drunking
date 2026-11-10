@@ -22,9 +22,28 @@ export function initials(name: string): string {
   return Array.from(last)[0].toUpperCase();
 }
 
-export function avatar(p: Player, cls = ''): string {
-  return `<span class="av ${cls}" style="--pc:${p.color}" data-pid="${p.id}"><span class="av-in">${esc(initials(p.name))}</span></span>`;
+/** Nội dung bên trong avatar: con vật nếu đã chọn, không thì chữ cái đầu. */
+export function avatarInner(p: Pick<Player, 'name' | 'animal'>, name = p.name): string {
+  return p.animal
+    ? `<span class="av-in av-emo">${p.animal}</span>`
+    : `<span class="av-in">${esc(initials(name))}</span>`;
 }
+
+export function avatar(p: Player, cls = ''): string {
+  return `<span class="av ${cls}${p.animal ? ' has-emo' : ''}" style="--pc:${p.color}" data-pid="${p.id}">${avatarInner(p)}</span>`;
+}
+
+/** Danh sách avatar con vật. */
+export const ANIMALS: Array<[string, string]> = [
+  ['🐊', 'Cá sấu'], ['🐸', 'Ếch'], ['🐢', 'Rùa'], ['🦎', 'Thằn lằn'], ['🐍', 'Rắn'], ['🦆', 'Vịt'],
+  ['🐶', 'Chó'], ['🐱', 'Mèo'], ['🐭', 'Chuột'], ['🐹', 'Hamster'], ['🐰', 'Thỏ'], ['🦊', 'Cáo'],
+  ['🐻', 'Gấu'], ['🐼', 'Gấu trúc'], ['🐨', 'Koala'], ['🐯', 'Hổ'], ['🦁', 'Sư tử'], ['🐮', 'Bò'],
+  ['🐷', 'Heo'], ['🐵', 'Khỉ'], ['🐔', 'Gà'], ['🐧', 'Cánh cụt'], ['🐦', 'Chim'], ['🦉', 'Cú'],
+  ['🦄', 'Kỳ lân'], ['🐴', 'Ngựa'], ['🦓', 'Ngựa vằn'], ['🦒', 'Hươu cao cổ'], ['🐘', 'Voi'], ['🦛', 'Hà mã'],
+  ['🐙', 'Bạch tuộc'], ['🦀', 'Cua'], ['🦞', 'Tôm hùm'], ['🐠', 'Cá'], ['🐬', 'Cá heo'], ['🦈', 'Cá mập'],
+  ['🐳', 'Cá voi'], ['🦭', 'Hải cẩu'], ['🐌', 'Ốc sên'], ['🦋', 'Bướm'], ['🐝', 'Ong'], ['🐞', 'Bọ rùa'],
+  ['🦔', 'Nhím'], ['🦥', 'Lười'], ['🦦', 'Rái cá'], ['🦘', 'Kangaroo'], ['🐲', 'Rồng'], ['🦖', 'Khủng long'],
+];
 
 /** Tên người chơi tô màu (chip). */
 export function nameChip(p: Player): string {

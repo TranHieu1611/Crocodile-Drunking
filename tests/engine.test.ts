@@ -266,3 +266,58 @@ describe('Răng Hít Đất / Squat', () => {
     expect(repsValues('squat')).toEqual([4, 5, 6, 7, 8, 9, 10]);
   });
 });
+
+describe('Chế độ chọn người', () => {
+  it('không lặp: mỗi người đúng 1 lần mỗi vòng, không trùng người liền kề giữa 2 vòng', () => {
+    const rng = seeded(12);
+    for (const n of [2, 3, 8, 12]) {
+      const g = createGame(players(n), S({ pickMode: 'bag' }), rng);
+      let prev = '';
+      for (let cycle = 0; cycle < 50; cycle++) {
+        const seen = new Set<string>();
+        for (let i = 0; i < n; i++) {
+          const id = pickPlayer(g, rng);
+          expect(seen.has(id)).toBe(false);
+          expect(id).not.toBe(prev);
+          seen.add(id);
+          prev = id;
+        }
+        expect(seen.size).toBe(n);
+      }
+    }
+  });
+
+  it('vòng tròn: lần lượt theo chỗ ngồi', () => {
+    const g = createGame(players(5), S({ pickMode: 'circle' }));
+    const order = Array.from({ length: 12 }, () => pickPlayer(g));
+    expect(order).toEqual(['p0', 'p1', 'p2', 'p3', 'p4', 'p0', 'p1', 'p2', 'p3', 'p4', 'p0', 'p1']);
+  });
+
+  it('ngẫu nhiên vẫn là mặc định', () => {
+    const g = createGame(players(4), S());
+    expect(g.settings.pickMode ?? 'random').toBe('random');
+  });
+});
+
+describe('Vòng tròn: hết vòng thì hết hàm', () => {
+  it('đủ mỗi người 1 lượt thì roundOver, dù còn răng độc', () => {
+    const g = createGame(players(4), S({ pickMode: 'circle' }), seeded(13));
+    const safe = g.round.teeth.map((k, i) => (k === 'safe' ? i : -1)).filter((i) => i >= 0);
+    for (let t = 0; t < 4; t++) {
+      expect(roundOver(g)).toBe(false);
+      pickPlayer(g);
+      revealTooth(g, safe[t]);
+    }
+    expect(poisonLeft(g)).toBe(7);
+    expect(roundOver(g)).toBe(true);
+    nextRound(g);
+    expect(roundOver(g)).toBe(false);
+  });
+
+  it('chế độ khác không kết thúc theo số lượt', () => {
+    const g = createGame(players(2), S({ pickMode: 'random' }), seeded(14));
+    const safe = g.round.teeth.map((k, i) => (k === 'safe' ? i : -1)).filter((i) => i >= 0);
+    for (let t = 0; t < 4; t++) { pickPlayer(g); revealTooth(g, safe[t]); }
+    expect(roundOver(g)).toBe(false);
+  });
+});

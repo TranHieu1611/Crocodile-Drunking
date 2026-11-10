@@ -6,7 +6,11 @@ export interface Player {
   color: string;
   couple: boolean;
   water: boolean;
+  /** Avatar con vật (emoji); không có thì hiện chữ cái đầu tên. */
+  animal?: string;
 }
+
+export type PickMode = 'random' | 'bag' | 'circle';
 
 export interface Settings {
   sexy: boolean;
@@ -16,6 +20,8 @@ export interface Settings {
   pickSeconds: number;
   boss: boolean;
   sound: boolean;
+  /** Cách chọn người: ngẫu nhiên / ngẫu nhiên không lặp tới khi đủ lượt / lần lượt theo chỗ ngồi. */
+  pickMode?: PickMode;
 }
 
 export type Reason = 'drink' | 'godsave' | 'hardDone' | 'hardFail' | 'buddyA' | 'buddyB' | 'buddyFree' | 'slow' | 'partySelf' | 'partyAll' | 'pushup' | 'squat' | 'exerciseFail';
@@ -52,6 +58,8 @@ export interface RoundState {
   teeth: ToothKind[];
   revealed: boolean[];
   log: LogEntry[];
+  /** Số lượt đã chọn răng trong hàm này. */
+  turns?: number;
 }
 
 export interface GameState {
@@ -65,6 +73,8 @@ export interface GameState {
   used: { hard: string[]; buddy: string[] };
   stats: Record<string, Stats>;
   lastQuip: string | null;
+  /** Chế độ 'bag': những người đã chơi trong lượt xoay hiện tại. */
+  picked?: string[];
 }
 
 export const DEFAULT_SETTINGS: Settings = {
@@ -75,6 +85,7 @@ export const DEFAULT_SETTINGS: Settings = {
   pickSeconds: CONFIG.PICK_SECONDS_DEFAULT,
   boss: true,
   sound: true,
+  pickMode: 'random',
 };
 
 export function emptyStats(): Stats {

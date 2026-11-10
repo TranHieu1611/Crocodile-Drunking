@@ -46,7 +46,7 @@
 
 /* ===== Vòng quay rõ ràng hơn (dùng chung God Save + Vòng Quay) ===== */
 .wheel-wrap { width: min(80vw, 320px, 40dvh); margin-top: 14px; }
-.wheel { overflow: visible; }
+svg.wheel { overflow: visible; }
 .w-frame { fill: #2A1206; stroke: #FFF6E8; stroke-width: 3; }
 .bulb { fill: #FFE08A; animation: bulb 1.2s steps(1) infinite; }
 .bulb.b1 { animation-delay: -.6s; }
@@ -70,7 +70,7 @@
 .slice > path { transition: stroke-width .3s; }
 .wheel-wrap.won .slice:not(.win) { opacity: .28; }
 .wheel-wrap.won .slice.win > path { stroke: #FFFFFF; stroke-width: 5; }
-.wheel-wrap.won .wheel { animation: winpop .5s cubic-bezier(.3, 1.6, .5, 1); }
+.wheel-wrap.won svg.wheel { animation: winpop .5s cubic-bezier(.3, 1.6, .5, 1); }
 @keyframes winpop { 40% { transform: scale(1.04); } }
 
 .mug rect { fill: #FFC93C; stroke: #2A1206; stroke-width: 2; }
